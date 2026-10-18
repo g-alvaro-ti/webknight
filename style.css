@@ -1,0 +1,10 @@
+/* Cada tela do jogo preenche a tela inteira do navegador */
+section {
+    height: 100vh;
+}
+
+/* Usado pra esconder telas, ou elementos específicos da página */
+/* Exemplo no JS: elementoHTML.classList.toggle("hidden",true) */
+.hidden{
+    display: none;
+}
