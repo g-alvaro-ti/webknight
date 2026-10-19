@@ -3,20 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/tela-inicio.css">
+    <link rel="stylesheet" href="css/tela-jogo.css">
+    <link rel="stylesheet" href="css/tela-batalha.css">
+    <link rel="stylesheet" href="css/tela-fim.css">
+    
     <title>WebKnight</title>
 </head>
 <body>
-    <h1>WebKnight</h1>
-    
     <!-- Tela inicial, contendo o cadastro do email do jogador-->
-    <section id="tela-inicial">
+    <section id="tela-inicial" class="hidden">
 
     </section>
 
     <!-- Tela com o mapa do jogo, jogador e inimigos -->
-    <section id="jogo" class="hidden">
+    <section id="jogo">
+        <div class="jogo-container">
+            <div class="jogo-localizacao">
+                Floresta
+            </div>
+            <div class="jogo-narrativa">
+                Você acordou em uma floresta escura, sem saber como chegou ali. Ao seu redor, você vê árvores altas e sombras misteriosas. De repente, você ouve um rugido distante e percebe que não está sozinho.
+            </div>
+            <div class="jogo-mapa-container">
 
+            </div>
+        </div>
     </section>
 
     <!-- Interface da batalha de turnos -->
@@ -30,5 +44,6 @@
     </section>
 
     <script src="src/script.js"></script>
+    <script src="src/mapa.js"></script>
 </body>
 </html>
