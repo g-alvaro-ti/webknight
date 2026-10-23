@@ -1,13 +1,6 @@
 
 function inicio(){
-
-    exibirTelaInicial(true)
-
-    // exibirJogo()
-
-    // exibirBatalhaTurno()
-
-    // exibirTelaFinal()
+    
 }
 
 function exibirTelaInicial(estado){

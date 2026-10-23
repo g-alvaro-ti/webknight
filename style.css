@@ -1,13 +1,21 @@
+@import url('https://fonts.googleapis.com/css2?family=Silkscreen&display=swap');
+
 *{
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
+body{
+    font-family: 'Silkscreen', monospace;
+}
+
 /* Cada tela do jogo preenche a tela inteira do navegador */
 section {
     height: 100vh;
     max-height: 100vh;
+    /* Borda pra ajudar a delimitar as páginas */
+    border-bottom: 2px solid black;
 }
 
 /* Usado pra esconder telas, ou elementos específicos da página */
@@ -15,3 +23,5 @@ section {
 .hidden{
     display: none;
 }
+
+/* Cores pra ajudar a delimitar as telas*/
