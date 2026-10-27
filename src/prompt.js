@@ -8,7 +8,7 @@ function gerar_prompt_mapa(){
         tipo_cenario : str,
         descricao : str,
         posicao_inimigos : int[][],
-        quantidade_inimigos
+        quantidade_inimigos : int
     }
     `
     return prompt;
