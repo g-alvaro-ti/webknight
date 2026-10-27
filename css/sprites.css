@@ -1,0 +1,88 @@
+
+:root {
+    --escala-sprite: 4;
+}
+
+/* Configuração genérica para qualquer sprite animado */
+.sprite-animado {
+    position: absolute;
+
+    /* Tamanho e centralização dos sprites */
+    width: calc(var(--cell-size) * var(--escala-sprite));
+    height: calc(var(--cell-size) * var(--escala-sprite));
+
+    left: calc(
+        (var(--cell-size) - var(--cell-size) * var(--escala-sprite)) / 2
+        + var(--sprite-offset-x, 0px)
+    );
+
+    top: calc(
+        (var(--cell-size) - var(--cell-size) * var(--escala-sprite)) / 2
+        + var(--sprite-offset-y, 0px)
+    );
+
+    /* Define a spritesheet como fundo da imagem */
+    background-image: var(--sprite-url);
+    background-repeat: no-repeat;
+
+    background-size:
+        calc(var(--sprite-frames) * var(--cell-size) * var(--escala-sprite))
+        calc(var(--cell-size) * var(--escala-sprite));
+
+    image-rendering: pixelated;
+
+    /* A quantidade de frames também define os steps */
+    animation:
+        animar-sprite
+        var(--sprite-duracao, 0.8s)
+        steps(var(--sprite-frames))
+        infinite;
+}
+
+@keyframes animar-sprite {
+    from {
+        background-position: 0 0;
+    }
+
+    to {
+        background-position:
+            calc(-1 * var(--sprite-frames) * var(--cell-size) * var(--escala-sprite))
+            0;
+    }
+}
+
+.cavaleiro-idle {
+    --sprite-url: url("../sprites/Soldier_Idle.png");
+    --sprite-frames: 6;
+    --sprite-duracao: 0.8s;
+
+    --sprite-offset-x: 0px;
+    --sprite-offset-y: 0px;
+}
+
+.demon-idle {
+    --sprite-url: url("../sprites/Demon_A_Idle.png");
+    --sprite-frames: 6;
+    --sprite-duracao: 1s;
+
+    --sprite-offset-x: -6px;
+    --sprite-offset-y: 0px;
+}
+
+.orc-idle {
+    --sprite-url: url("../sprites/Orc_Idle.png");
+    --sprite-frames: 6;
+    --sprite-duracao: 1s;
+
+    --sprite-offset-x: -10px;
+    --sprite-offset-y: 0px;
+}
+
+.monster-idle {
+    --sprite-url: url("../sprites/Blood_Monster_A_Idle.png");
+    --sprite-frames: 6;
+    --sprite-duracao: 1s;
+
+    --sprite-offset-x: -4px;
+    --sprite-offset-y: 0px;
+}
