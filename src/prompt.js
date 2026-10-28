@@ -16,7 +16,7 @@ Implementar o parâmetro regiao, selecionado aleatoriamente de uma lista predefi
                 [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                 [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
-const json_teste = {"tipo_cenario" : "cidade","inimigos_derrotados" : 4,"total_inimigos": 4,"matriz_mapa" : matriz_teste}*/
+const json_teste = {"tipo_cenario" : "cidade","inimigos_derrotados" : 2,"total_inimigos": 4,"matriz_mapa" : matriz_teste}*/
 
 const PISO = 0;
 const SAIDA = 1;
