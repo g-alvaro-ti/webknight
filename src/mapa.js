@@ -1,6 +1,7 @@
 const mapaContainer = document.querySelector(".jogo-mapa-container");
 
-const tamanhoMapa = 15;
+const LINHAS = 10;
+const COLUNAS = 15;
 
 const SPRITE_PLAYER = "sprites/Soldier_Idle1.png"
 const SPRITE_DEMON = "sprites/Demon_A_Idle1.png"
@@ -32,19 +33,24 @@ function adicionarSpriteAnimado(celula, classeSprite, ordemZ = 1) {
     return sprite;
 }
 
-for(let i=0; i < 10 * 15; i++){
-    const celula = document.createElement("div");
-    celula.classList.add("mapa-celula");
-    celula.dataset.indice = i;
+const mapa = [];
 
-    if (i === 66) {
-        // adicionarCamada(celula, SPRITE_PLAYER, 2);
-        adicionarSpriteAnimado(celula, "cavaleiro-idle", 2);
+for (let i = 0; i < LINHAS; i++) {
+    mapa[i] = [];
+    for (let j = 0; j < COLUNAS; j++) {
+        const celula = document.createElement("div");
+        celula.classList.add("mapa-celula");
+        
+        celula.dataset.linha = i;
+        celula.dataset.coluna = j;
+        mapa[i][j] = celula;
+        mapaContainer.appendChild(celula);
     }
-    else if (i === 68) {
-        // adicionarCamada(celula, SPRITE_DEMON, 2);
-        adicionarSpriteAnimado(celula, "demon-idle", 2);
-    }
-
-    mapaContainer.appendChild(celula);
 }
+
+// Adicionando spritesheets
+adicionarSpriteAnimado(mapa[0][0], "cavaleiro-idle", 2)
+adicionarSpriteAnimado(mapa[0][2], "demon-idle", 2)
+// Adicionando imagens paradas
+adicionarCamada(mapa[1][0], SPRITE_PLAYER, 2);
+adicionarCamada(mapa[1][2], SPRITE_DEMON, 2);
