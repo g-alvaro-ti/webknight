@@ -6,6 +6,40 @@ const COLUNAS = 15;
 const SPRITE_PLAYER = "sprites/Soldier_Idle1.png"
 const SPRITE_DEMON = "sprites/Demon_A_Idle1.png"
 
+const CORES_REGIOES = {
+    "Floresta": {
+        0: "#477A3C", // Piso
+        1: "#D9C65B", // Saída
+        2: "#344D2D", // Parede
+        3: "#477A3C", // Inimigo (piso)
+        4: "#477A3C"  // Jogador (piso)
+    },
+
+    "Cidade": {
+        0: "#858585",
+        1: "#D9C65B",
+        2: "#454545",
+        3: "#858585",
+        4: "#858585"
+    },
+
+    "Ruina": {
+        0: "#81765D",
+        1: "#D9C65B",
+        2: "#49443A",
+        3: "#81765D",
+        4: "#81765D"
+    },
+
+    "Montanha": {
+        0: "#A6ADB5",
+        1: "#D9C65B",
+        2: "#59616B",
+        3: "#A6ADB5",
+        4: "#A6ADB5"
+    }
+};
+
 // Função para injetar uma imagem estática em uma célula específica
 function adicionarCamada(celula, caminhoImagem, ordemZ = 1) {
     const img = document.createElement("img");
@@ -34,7 +68,7 @@ function adicionarSpriteAnimado(celula, classeSprite, ordemZ = 1) {
 }
 
 const mapa = [];
-
+function gerarMapaVazio(){
 for (let i = 0; i < LINHAS; i++) {
     mapa[i] = [];
     for (let j = 0; j < COLUNAS; j++) {
@@ -47,10 +81,71 @@ for (let i = 0; i < LINHAS; i++) {
         mapaContainer.appendChild(celula);
     }
 }
+}
+
+function gerarMapa(matriz_mapa, tipo_cenario) {
+    // Limpa o mapa anterior
+    mapaContainer.innerHTML = [];
+
+    // Limpa a matriz de elementos HTML
+    mapa.length = 0;
+
+    // Obtém as cores correspondentes à região
+    const cores = CORES_REGIOES[tipo_cenario];
+
+    if (!cores) {
+        console.error("Cenário desconhecido:", tipo_cenario);
+        return;
+    }
+
+    // Percorre a matriz recebida do Gemini
+    for (let i = 0; i < matriz_mapa.length; i++) {
+
+        mapa[i] = [];
+
+        for (let j = 0; j < matriz_mapa[i].length; j++) {
+
+            const valor = matriz_mapa[i][j];
+
+            const celula = document.createElement("div");
+            celula.classList.add("mapa-celula");
+
+            celula.dataset.linha = i;
+            celula.dataset.coluna = j;
+
+            // Define a aparência conforme o valor da matriz
+            switch (valor) {
+                case 0: // Piso
+                    celula.style.backgroundColor = cores[0];
+                    break;
+                case 1: // Saída
+                    celula.style.backgroundColor = cores[1];
+                    break;
+                case 2: // Parede
+                    celula.style.backgroundColor = cores[2];
+                    break;
+                case 3: // Inimigo
+                    celula.style.backgroundColor = cores[3];
+                    break;
+                case 4: // Jogador
+                    celula.style.backgroundColor = cores[4];
+                    break;
+                default:
+                    console.error(`Valor inválido na posição [${i}][${j}]:`, valor);
+                    celula.style.backgroundColor = "#FF00FF";
+                    break;
+            }
+
+            // Adiciona a célula na matriz, pra poder ser acessada depois
+            mapa[i][j] = celula;
+            mapaContainer.appendChild(celula);
+        }
+    }
+}
 
 // Adicionando spritesheets
-adicionarSpriteAnimado(mapa[0][0], "cavaleiro-idle", 2)
-adicionarSpriteAnimado(mapa[0][2], "demon-idle", 2)
+// adicionarSpriteAnimado(mapa[0][0], "cavaleiro-idle", 2)
+// adicionarSpriteAnimado(mapa[0][2], "demon-idle", 2)
 // Adicionando imagens paradas
-adicionarCamada(mapa[1][0], SPRITE_PLAYER, 2);
-adicionarCamada(mapa[1][2], SPRITE_DEMON, 2);
+// adicionarCamada(mapa[1][0], SPRITE_PLAYER, 2);
+// adicionarCamada(mapa[1][2], SPRITE_DEMON, 2);

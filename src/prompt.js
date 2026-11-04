@@ -38,6 +38,7 @@ function gerar_prompt_mapa(lista_regiao){
     - Todos os inimigos devem ser alcançáveis pelo jogador
         através de pisos caminháveis.
     - Utilize somente os valores da legenda.
+    - Não coloque paredes nas bordas da matriz. Coloque e distribua-as de forma criativa.
 
     A descrição deve ter no máximo 3 linhas e resumir
     objetivamente a distribuição do mapa, ajudando a definir
@@ -60,7 +61,7 @@ async function chamar_gemini(prompt) {
     //para testes lembre-se de trocar
     // const API_KEY = "Chave";
     const API_KEY = document.querySelector(".chave-api").value;
-    const MODELO = "gemini-2.5-flash";
+    const MODELO = "gemini-3.5-flash";
     const URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODELO}:generateContent`;
     try {
         const resposta = await fetch(URL, {
@@ -133,13 +134,20 @@ async function chamar_gemini(prompt) {
     }    
 }
 
+// Botão temporário pra testar a criação do mapa, depois será uma função propria
 botaoGeminiMapa.addEventListener("click", async function() {
     console.log("Resultado do prompt:");
-    texto = gerar_prompt_mapa(lista_regiao)
-    resposta_prompt = await chamar_gemini(texto);
+
+    const texto = gerar_prompt_mapa(lista_regiao);
+    const resposta_prompt = await chamar_gemini(texto);
+
     console.log(resposta_prompt);
 
-    console.log("Mapa:")
-    const mapa = JSON.parse(resposta_prompt);
-    console.log(mapa.matriz_mapa);
+    const resultado = JSON.parse(resposta_prompt);
+
+    // Gera o mapa no HTML, com a função do mapa.js
+    gerarMapa(
+        resultado.matriz_mapa,
+        resultado.tipo_cenario
+    );
 });
