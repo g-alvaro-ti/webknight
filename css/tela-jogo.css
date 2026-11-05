@@ -63,7 +63,6 @@
 
 .mapa-celula {
     background-color: rgb(255, 255, 255);
-    border: 1px solid var(--cor-cinza1);
 
     width: var(--cell-size);
     height: var(--cell-size);

@@ -5,6 +5,9 @@ const COLUNAS = 15;
 
 const SPRITE_PLAYER = "sprites/Soldier_Idle1.png"
 const SPRITE_DEMON = "sprites/Demon_A_Idle1.png"
+const OBJECT_TREE = "sprites/object-tree.png"
+const TEXTURE_1 = "sprites/texture.png"
+const TEXTURE_2 = "sprites/texture2.png"
 
 const CORES_REGIOES = {
     "Floresta": {
@@ -117,18 +120,41 @@ function gerarMapa(matriz_mapa, tipo_cenario) {
             switch (valor) {
                 case 0: // Piso
                     celula.style.backgroundColor = cores[0];
+                    celula.dataset.tipo = "piso"
+
+                    // Coloca uma cor mais escura em pisos aleatórios, com 2 tons diferentes
+                    chance_textura = Math.floor(Math.random() * 5);
+
+                    if(chance_textura == 1){
+                        adicionarCamada(celula, TEXTURE_1, 2);
+                    }else if(chance_textura == 2){
+                        adicionarCamada(celula, TEXTURE_2, 2);
+                    }
+
                     break;
                 case 1: // Saída
                     celula.style.backgroundColor = cores[1];
+                    celula.dataset.tipo = "saida"
+
                     break;
                 case 2: // Parede
                     celula.style.backgroundColor = cores[2];
+                    celula.dataset.tipo = "parede"
+                    
+                    // Adicionando um objeto decorativo
+                    adicionarCamada(celula, OBJECT_TREE, 2);
                     break;
                 case 3: // Inimigo
                     celula.style.backgroundColor = cores[3];
+                    celula.dataset.tipo = "piso"
+
+                    adicionarSpriteAnimado(celula, "demon-idle", 2)
                     break;
                 case 4: // Jogador
                     celula.style.backgroundColor = cores[4];
+                    celula.dataset.tipo = "piso"
+
+                    adicionarSpriteAnimado(celula, "cavaleiro-idle", 2)
                     break;
                 default:
                     console.error(`Valor inválido na posição [${i}][${j}]:`, valor);
@@ -140,6 +166,22 @@ function gerarMapa(matriz_mapa, tipo_cenario) {
             mapa[i][j] = celula;
             mapaContainer.appendChild(celula);
         }
+    }
+}
+
+// Teste para sempre carregar a página com um mapa padrão,
+// com piso, paredes, jogador, inimigos e saída
+// pra evitar de usar a API o tempo todo durante o desenvolvimento
+let mapaTestePadrao = true
+// Pro cenário ser aleatório toda vez que recarregar a página
+let cenarioAleatorio = false
+
+if(mapaTestePadrao == true){
+    const matrizTeste = [[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,4,0,2,2,0,0,0,0,2,2,0,3,0,0],[0,0,0,2,2,0,2,2,0,2,2,0,0,0,0],[0,0,0,0,0,0,2,2,0,0,0,0,0,0,0],[0,2,2,0,0,0,0,0,0,0,0,2,2,0,0],[0,2,2,0,3,0,0,0,0,0,0,2,2,0,0],[0,0,0,0,0,0,2,2,0,0,0,0,0,0,0],[0,0,0,2,2,0,2,2,0,2,2,0,0,0,0],[0,3,0,2,2,0,0,0,0,2,2,0,1,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]]
+    if(cenarioAleatorio){
+        gerarMapa(matrizTeste, cenario_aleatorio(lista_regiao))
+    }else{
+        gerarMapa(matrizTeste, "Floresta")
     }
 }
 
