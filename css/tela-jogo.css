@@ -5,6 +5,9 @@
   --cor-vermelho: #6b0f1a;
   --cor-cinza1: #7b6d8d;
   --cor-cinza2: #8499b1;
+
+  /* 15 colunas * 48px (720px) + 6px de padding + 10px de bordas = 736px */
+  --largura-mapa: calc(15 * var(--cell-size) + 16px);
 }
 
 #tela-jogo {
@@ -29,11 +32,13 @@
     z-index: -1;
 }
 
-.jogo-container{
-    display: grid;
-    grid-template-rows: minmax(0, 1fr)
-                       minmax(0, 5fr)
-                       minmax(0, 1fr);
+/* Agrupa os 3 elementos no centro e controla o espaço entre eles via gap */
+.jogo-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
     height: 100%;
     min-height: 0;
     box-sizing: border-box;
@@ -48,11 +53,8 @@
     grid-template-columns: repeat(15, var(--cell-size));
     grid-template-rows: repeat(10, var(--cell-size));
 
-    /* Ajusta a largura e altura exatas do conteúdo e centraliza na tela */
     width: fit-content;
     height: fit-content;
-    justify-self: center;
-    align-self: center; 
 
     background-color: var(--cor-escuro2);
     padding: 3px;
@@ -94,9 +96,6 @@
     width: fit-content;
     height: fit-content;
 
-    justify-self: center;
-    align-self: center;
-
     font-size: 1.5rem;
     font-weight: bold;
 
@@ -115,10 +114,13 @@
     align-items: center;
     text-align: center;
 
-    width: 70%;
-    margin: 0 auto;
+    /* Alinha exatamente com as bordas laterais do mapa */
+    width: var(--largura-mapa);
+    max-width: 90vw;
+    box-sizing: border-box;
+    padding: 12px 18px;
 
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     font-weight: bold;
 
     color: white;
@@ -127,6 +129,4 @@
     border: 3px var(--cor-cinza2) solid;
     outline: 3px solid var(--cor-cinza1);
     border-radius: 5px;
-
-    margin-bottom: 20px;
 }
