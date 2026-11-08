@@ -1,0 +1,176 @@
+/* ============================================================
+   painel-jogador.css  —  css/painel_informacoes/
+   Painel lateral esquerdo + colapso em telas pequenas.
+   ============================================================ */
+
+/* ---- Painel lateral (ancorado ao #tela-jogo, sempre à esquerda) ---- */
+#painel-jogador {
+    position: absolute;
+    top: 50%;
+    left: clamp(8px, 1.5vw, 20px);
+    transform: translateY(-50%);
+    z-index: 10;
+
+    display: flex;
+    flex-direction: column;
+    gap: clamp(6px, 0.8vh, 10px);
+
+    width: clamp(120px, 12vw, 165px);
+    max-height: 92vh;
+    overflow-y: auto;
+    scrollbar-width: none;
+}
+
+/* Estado colapsado — oculta o painel */
+#painel-jogador.painel-oculto {
+    display: none;
+}
+
+/* ---- Botão de recolher (❮) — aparece dentro do painel só em telas pequenas ---- */
+#painel-btn-colapsar {
+    display: none;              /* JS adiciona .visivel quando necessário */
+    align-self: flex-end;
+    cursor: pointer;
+
+    font-family: 'Silkscreen', monospace;
+    font-size: 0.55rem;
+    color: var(--cor-cinza2);
+
+    background-color: var(--cor-escuro1);
+    border: 1px solid var(--cor-cinza1);
+    border-radius: 3px;
+    padding: 3px 7px;
+
+    transition: color 0.15s, border-color 0.15s;
+}
+#painel-btn-colapsar:hover { color: white; border-color: var(--cor-cinza2); }
+#painel-btn-colapsar.visivel { display: block; }
+
+/* ---- Botão minimalista de expandir (só em telas pequenas, painel colapsado) ---- */
+#painel-btn-toggle {
+    display: none;              /* JS adiciona .visivel quando necessário */
+    position: absolute;
+    top: 50%;
+    left: clamp(8px, 1.5vw, 20px);
+    transform: translateY(-50%);
+    z-index: 20;
+
+    cursor: pointer;
+
+    font-family: 'Silkscreen', monospace;
+    font-size: 0.85rem;
+    color: white;
+    text-shadow: 0px 1px rgba(255, 0, 0, 0.6);
+
+    background-color: var(--cor-escuro2);
+    border: 3px solid var(--cor-cinza2);
+    outline: 3px solid var(--cor-cinza1);
+    border-radius: 5px;
+    box-shadow: 0px 5px var(--cor-cinza1);
+    padding: 12px 7px;
+
+    transition: background-color 0.15s ease;
+}
+#painel-btn-toggle:hover   { background-color: var(--cor-vermelho); }
+#painel-btn-toggle.visivel { display: flex; align-items: center; justify-content: center; }
+
+/* ================================================================
+   Cards — mesmo visual do hub do jogo
+   ================================================================ */
+.painel-card {
+    background-color: var(--cor-escuro2);
+    border: 3px solid var(--cor-cinza2);
+    outline: 3px solid var(--cor-cinza1);
+    border-radius: 5px;
+    box-shadow: 0px 5px var(--cor-cinza1);
+    padding: clamp(7px, 1vh, 12px) clamp(8px, 1vw, 14px);
+    color: white;
+}
+
+.painel-titulo {
+    font-size: clamp(0.55rem, 0.9vw, 0.68rem);
+    font-weight: bold;
+    color: var(--cor-cinza2);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-align: center;
+    text-shadow: 0px 1px rgba(255, 0, 0, 0.6);
+    border-bottom: 1px solid var(--cor-cinza1);
+    padding-bottom: 5px;
+    margin-bottom: 8px;
+}
+
+/* ---- Atributos ---- */
+.painel-atributo {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    margin-bottom: clamp(5px, 0.8vh, 8px);
+}
+.painel-atributo:last-child { margin-bottom: 0; }
+
+.painel-atributo-label {
+    font-size: clamp(0.52rem, 0.8vw, 0.63rem);
+    font-weight: bold;
+    color: var(--cor-cinza2);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.painel-barra-fundo {
+    width: 100%;
+    height: clamp(6px, 0.9vh, 9px);
+    background-color: var(--cor-escuro1);
+    border-radius: 3px;
+    border: 1px solid var(--cor-cinza1);
+    overflow: hidden;
+}
+
+.painel-barra-preenchimento {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.4s ease;
+}
+
+.painel-barra-vida       { background-color: #c0392b; }
+.painel-barra-forca      { background-color: #e67e22; }
+.painel-barra-defesa     { background-color: #2980b9; }
+.painel-barra-velocidade { background-color: #27ae60; }
+
+.painel-atributo-valor {
+    font-size: clamp(0.5rem, 0.75vw, 0.6rem);
+    text-align: right;
+    color: white;
+    text-shadow: 0px 1px rgba(255, 0, 0, 0.5);
+}
+
+/* ---- Localização ---- */
+.painel-localizacao-info {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(5px, 0.8vh, 8px);
+}
+
+.painel-info-linha {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    font-size: clamp(0.52rem, 0.8vw, 0.63rem);
+    gap: 4px;
+}
+
+.painel-info-chave {
+    color: var(--cor-cinza2);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+.painel-info-valor {
+    color: white;
+    text-shadow: 0px 1px rgba(255, 0, 0, 0.5);
+    font-weight: bold;
+    text-align: right;
+    word-break: break-word;
+}
