@@ -167,6 +167,9 @@ function gerarMapa(matriz_mapa, tipo_cenario) {
             mapaContainer.appendChild(celula);
         }
     }
+    // Notifica o painel que o mapa foi totalmente gerado,
+    // atualizando a região exibida e incrementando o contador de mapas visitados.
+    if (typeof notificarMudancaMapa === "function") notificarMudancaMapa(tipo_cenario);
 }
 
 // Teste para sempre carregar a página com um mapa padrão,
