@@ -8,6 +8,21 @@ let timerAndar   = null;
 const LINHAS = 10;
 const COLUNAS = 15;
 
+// Estado dos inimigos presentes no mapa (posição + elemento do sprite),
+// mantido aqui pra não perder eles a cada tela gerada
+const inimigos = [];
+
+// Chance do inimigo permanecer parado em vez de tentar se movimentar
+const CHANCE_INIMIGO_PARADO = 0.3;
+
+// Direções possíveis que um inimigo pode tomar (sem diagonais)
+const DIRECOES_INIMIGO = [
+    { dx:  0, dy: -1 }, // Cima
+    { dx:  0, dy:  1 }, // Baixo
+    { dx: -1, dy:  0 }, // Esquerda
+    { dx:  1, dy:  0 }  // Direita
+];
+
 const SPRITE_PLAYER = "sprites/Soldier_Idle1.png"
 const SPRITE_DEMON = "sprites/Demon_A_Idle1.png"
 const OBJECT_TREE = "sprites/object-tree.png"
@@ -98,6 +113,9 @@ function gerarMapa(matriz_mapa, tipo_cenario) {
     // Limpa a matriz de elementos HTML
     mapa.length = 0;
 
+    // Limpa o estado dos inimigos do mapa anterior
+    inimigos.length = 0;
+
     jogadorElemento = null;
     jogadorPosicao  = { linha: 0, coluna: 0 };  
 
@@ -156,7 +174,15 @@ function gerarMapa(matriz_mapa, tipo_cenario) {
                     celula.style.backgroundColor = cores[3];
                     celula.dataset.tipo = "inimigo"
 
-                    adicionarSpriteAnimado(celula, "demon-idle", 2)
+                    const spriteInimigo = adicionarSpriteAnimado(celula, "demon-idle", 2)
+
+                    // Guarda o inimigo com sua posição e elemento,
+                    // pra poder movimentá-lo sem recriar o sprite depois
+                    inimigos.push({
+                        linha: i,
+                        coluna: j,
+                        elemento: spriteInimigo
+                    });
 
                     break;
                 case 4: // Jogador
@@ -223,6 +249,9 @@ function moverJogador(dx, dy) {
 
     jogadorPosicao = { linha: novaLinha, coluna: novaColuna };
 
+    // Todos os inimigos tentam se movimentar após o jogador se mover
+    moverInimigos();
+
 
     jogadorElemento.classList.remove("cavaleiro-idle");
     jogadorElemento.classList.remove(
@@ -250,6 +279,56 @@ function moverJogador(dx, dy) {
     }, 200);
 
     return true;
+}
+
+// Verifica se a célula destino pode ser ocupada por um inimigo,
+// bloqueando paredes, os limites do mapa, outros inimigos e o próprio jogador
+function podeMoverInimigo(linha, coluna) {
+    if (linha  < 0 || linha  >= LINHAS)  return false;
+    if (coluna < 0 || coluna >= COLUNAS) return false;
+
+    const tipoCelula = mapa[linha][coluna].dataset.tipo;
+    if (tipoCelula === "parede" || tipoCelula === "inimigo") return false;
+
+    // Não deixa o inimigo pisar em cima do jogador
+    if (linha === jogadorPosicao.linha && coluna === jogadorPosicao.coluna) return false;
+
+    return true;
+}
+
+// Sorteia um movimento aleatório pra cada inimigo do mapa,
+// com chance de permanecer parado, e já move o sprite pra célula destino
+function moverInimigos() {
+    for (const inimigo of inimigos) {
+        // Chance de permanecer parado neste turno
+        if (Math.random() < CHANCE_INIMIGO_PARADO) continue;
+
+        // Mantém só as direções que não levam a paredes ou fora dos limites
+        const direcoesValidas = DIRECOES_INIMIGO.filter(({ dx, dy }) =>
+            podeMoverInimigo(inimigo.linha + dy, inimigo.coluna + dx)
+        );
+
+        if (direcoesValidas.length === 0) continue;
+
+        const { dx, dy } = direcoesValidas[Math.floor(Math.random() * direcoesValidas.length)];
+
+        const novaLinha  = inimigo.linha  + dy;
+        const novaColuna = inimigo.coluna + dx;
+
+        const celulaAtual   = mapa[inimigo.linha][inimigo.coluna];
+        const celulaDestino = mapa[novaLinha][novaColuna];
+
+        celulaAtual.removeChild(inimigo.elemento);
+        celulaDestino.appendChild(inimigo.elemento);
+
+        // A célula que o inimigo saiu volta a ser piso e o destino passa a ser inimigo
+        celulaAtual.dataset.tipo   = "piso";
+        celulaDestino.dataset.tipo = "inimigo";
+
+        // Atualiza o estado do inimigo pra próxima movimentação
+        inimigo.linha  = novaLinha;
+        inimigo.coluna = novaColuna;
+    }
 }
 
 
@@ -371,8 +450,6 @@ document.addEventListener("keyup", (evento) => {
 
 // Loop contínuo (para segurar tecla)
 setInterval(tentarMover, 16);
-
-
 
 
 // Adicionando spritesheets
