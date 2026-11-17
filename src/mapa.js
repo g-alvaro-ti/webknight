@@ -1,5 +1,8 @@
 const mapaContainer = document.querySelector(".jogo-mapa-container");
 
+let jogadorElemento = null;
+let jogadorPosicao  = { linha: 0, coluna: 0 };
+
 const LINHAS = 10;
 const COLUNAS = 15;
 
@@ -93,6 +96,9 @@ function gerarMapa(matriz_mapa, tipo_cenario) {
     // Limpa a matriz de elementos HTML
     mapa.length = 0;
 
+    jogadorElemento = null;
+    jogadorPosicao  = { linha: 0, coluna: 0 };  
+
     // Obtém as cores correspondentes à região
     const cores = CORES_REGIOES[tipo_cenario];
 
@@ -146,15 +152,17 @@ function gerarMapa(matriz_mapa, tipo_cenario) {
                     break;
                 case 3: // Inimigo
                     celula.style.backgroundColor = cores[3];
-                    celula.dataset.tipo = "piso"
+                    celula.dataset.tipo = "inimigo"
 
                     adicionarSpriteAnimado(celula, "demon-idle", 2)
+
                     break;
                 case 4: // Jogador
                     celula.style.backgroundColor = cores[4];
                     celula.dataset.tipo = "piso"
 
-                    adicionarSpriteAnimado(celula, "cavaleiro-idle", 2)
+                    jogadorElemento = adicionarSpriteAnimado(celula, "cavaleiro-idle", 2)
+                    jogadorPosicao  = { linha: i, coluna: j };
                     break;
                 default:
                     console.error(`Valor inválido na posição [${i}][${j}]:`, valor);
@@ -188,6 +196,49 @@ if(mapaTestePadrao == true){
     }
 }
 
+function moverJogador(dx, dy) {
+    if (!jogadorElemento) return;
+
+    const novaLinha  = jogadorPosicao.linha  + dy;
+    const novaColuna = jogadorPosicao.coluna + dx;
+
+    // Fora dos limites do grid
+    if (novaLinha  < 0 || novaLinha  >= LINHAS)  return;
+    if (novaColuna < 0 || novaColuna >= COLUNAS) return;
+
+    const celulaDestino = mapa[novaLinha][novaColuna];
+
+    // Parede: bloqueia o movimento
+    if (celulaDestino.dataset.tipo === "parede") return;
+
+    //Bloqueia o movimento se tiver inimigos próximos.
+    if (celulaDestino.dataset.tipo == "inimigo") return;
+
+    // Move o sprite no DOM: tira da célula atual e coloca na nova
+    const celulaAtual = mapa[jogadorPosicao.linha][jogadorPosicao.coluna];
+    celulaAtual.removeChild(jogadorElemento);
+    celulaDestino.appendChild(jogadorElemento);
+
+    jogadorPosicao = { linha: novaLinha, coluna: novaColuna };
+}
+
+document.addEventListener("keydown", (evento) => {
+    // Ignora se o usuário está digitando num input (ex.: a chave da API)
+    const tag = evento.target.tagName;
+    if (tag === "INPUT" || tag === "TEXTAREA") return;
+
+    let moveu = true;
+    switch (evento.key.toLowerCase()) {
+        case "w": case "arrowup":    moverJogador(0, -1); break;
+        case "s": case "arrowdown":  moverJogador(0,  1); break;
+        case "a": case "arrowleft":  moverJogador(-1, 0); break;
+        case "d": case "arrowright": moverJogador( 1, 0); break;
+        default: moveu = false;
+    }
+
+    // Evita que as setas rolem a página
+    if (moveu) evento.preventDefault();
+});
 // Adicionando spritesheets
 // adicionarSpriteAnimado(mapa[0][0], "cavaleiro-idle", 2)
 // adicionarSpriteAnimado(mapa[0][2], "demon-idle", 2)
