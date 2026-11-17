@@ -452,8 +452,6 @@ document.addEventListener("keyup", (evento) => {
 setInterval(tentarMover, 16);
 
 
-
-
 // Adicionando spritesheets
 // adicionarSpriteAnimado(mapa[0][0], "cavaleiro-idle", 2)
 // adicionarSpriteAnimado(mapa[0][2], "demon-idle", 2)
