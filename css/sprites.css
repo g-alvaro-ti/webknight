@@ -7,7 +7,6 @@
 .sprite-animado {
     position: absolute;
 
-    /* Tamanho e centralização dos sprites */
     width: calc(var(--cell-size) * var(--escala-sprite));
     height: calc(var(--cell-size) * var(--escala-sprite));
 
@@ -21,17 +20,15 @@
         + var(--sprite-offset-y, 0px)
     );
 
-    /* Define a spritesheet como fundo da imagem */
     background-image: var(--sprite-url);
     background-repeat: no-repeat;
 
     background-size:
         calc(var(--sprite-frames) * var(--cell-size) * var(--escala-sprite))
-        calc(var(--cell-size) * var(--escala-sprite));
+        calc(var(--sprite-linhas-total, 1) * var(--cell-size) * var(--escala-sprite));
 
     image-rendering: pixelated;
 
-    /* A quantidade de frames também define os steps */
     animation:
         animar-sprite
         var(--sprite-duracao, 0.8s)
@@ -41,13 +38,14 @@
 
 @keyframes animar-sprite {
     from {
-        background-position: 0 0;
+        background-position:
+            0
+            calc(-1 * var(--sprite-linha, 0) * var(--cell-size) * var(--escala-sprite));
     }
-
     to {
         background-position:
             calc(-1 * var(--sprite-frames) * var(--cell-size) * var(--escala-sprite))
-            0;
+            calc(-1 * var(--sprite-linha, 0) * var(--cell-size) * var(--escala-sprite));
     }
 }
 
@@ -86,3 +84,18 @@
     --sprite-offset-x: -4px;
     --sprite-offset-y: 0px;
 }
+
+.cavaleiro-walk {
+    --sprite-url: url("../sprites/Soldier_Walk.png");
+    --sprite-frames: 6;
+    --sprite-duracao: 0.5s;
+    --sprite-linhas-total: 4;
+
+    --sprite-offset-x: 0px;
+    --sprite-offset-y: 0px;
+}
+
+.cavaleiro-walk-baixo    { --sprite-linha: 0; } /* Linha 1 */
+.cavaleiro-walk-cima { --sprite-linha: 1; } /* Linha 2 */
+.cavaleiro-walk-esquerda  { --sprite-linha: 2; } /* Linha 3 */
+.cavaleiro-walk-direita     { --sprite-linha: 3; } /* Linha 4 */

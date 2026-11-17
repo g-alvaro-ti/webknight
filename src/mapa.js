@@ -2,6 +2,8 @@ const mapaContainer = document.querySelector(".jogo-mapa-container");
 
 let jogadorElemento = null;
 let jogadorPosicao  = { linha: 0, coluna: 0 };
+let direcaoAtual = "baixo";  
+let timerAndar   = null;     
 
 const LINHAS = 10;
 const COLUNAS = 15;
@@ -197,48 +199,182 @@ if(mapaTestePadrao == true){
 }
 
 function moverJogador(dx, dy) {
-    if (!jogadorElemento) return;
+    if (!jogadorElemento) return false;
 
     const novaLinha  = jogadorPosicao.linha  + dy;
     const novaColuna = jogadorPosicao.coluna + dx;
 
-    // Fora dos limites do grid
-    if (novaLinha  < 0 || novaLinha  >= LINHAS)  return;
-    if (novaColuna < 0 || novaColuna >= COLUNAS) return;
+    if (novaLinha  < 0 || novaLinha  >= LINHAS)  return false;
+    if (novaColuna < 0 || novaColuna >= COLUNAS) return false;
 
     const celulaDestino = mapa[novaLinha][novaColuna];
 
-    // Parede: bloqueia o movimento
-    if (celulaDestino.dataset.tipo === "parede") return;
+    if (celulaDestino.dataset.tipo === "parede") return false;
+    if (celulaDestino.dataset.tipo === "inimigo") return false;
 
-    //Bloqueia o movimento se tiver inimigos próximos.
-    if (celulaDestino.dataset.tipo == "inimigo") return;
+    if (dy < 0) direcaoAtual = "cima";
+    if (dy > 0) direcaoAtual = "baixo";
+    if (dx < 0) direcaoAtual = "esquerda";
+    if (dx > 0) direcaoAtual = "direita";
 
-    // Move o sprite no DOM: tira da célula atual e coloca na nova
     const celulaAtual = mapa[jogadorPosicao.linha][jogadorPosicao.coluna];
     celulaAtual.removeChild(jogadorElemento);
     celulaDestino.appendChild(jogadorElemento);
 
     jogadorPosicao = { linha: novaLinha, coluna: novaColuna };
+
+
+    jogadorElemento.classList.remove("cavaleiro-idle");
+    jogadorElemento.classList.remove(
+        "cavaleiro-walk-baixo",
+        "cavaleiro-walk-cima",
+        "cavaleiro-walk-esquerda",
+        "cavaleiro-walk-direita"
+    );
+    jogadorElemento.classList.add("cavaleiro-walk", `cavaleiro-walk-${direcaoAtual}`);
+
+
+    clearTimeout(timerAndar);
+    timerAndar = setTimeout(() => {
+        if (!jogadorElemento) return;
+
+ 
+        jogadorElemento.classList.remove(
+            "cavaleiro-walk",
+            "cavaleiro-walk-baixo",
+            "cavaleiro-walk-cima",
+            "cavaleiro-walk-esquerda",
+            "cavaleiro-walk-direita"
+        );
+        jogadorElemento.classList.add("cavaleiro-idle");
+    }, 200);
+
+    return true;
 }
 
+
+const TECLAS_MOVIMENTO = {
+    w:          { dx:  0, dy: -1 },
+    s:          { dx:  0, dy:  1 },
+    a:          { dx: -1, dy:  0 },
+    d:          { dx:  1, dy:  0 },
+    arrowup:    { dx:  0, dy: -1 },
+    arrowdown:  { dx:  0, dy:  1 },
+    arrowleft:  { dx: -1, dy:  0 },
+    arrowright: { dx:  1, dy:  0 }
+};
+
+const teclasPressionadas = {};      // timestamp de cada tecla (0 = solta)
+const filaInputs         = [];      // fila pra não perder toques rápidos
+const MAX_FILA           = 3;
+const EXPIRACAO_INPUT    = 300;     // ms
+
+let ultimoTempoMovimento = 0;
+const DELAY_MOVIMENTO    = 150;     // ms entre passos
+
+// Diagonal: prioriza a tecla pressionada MAIS RECENTEMENTE
+function calcularDirecaoSegurada() {
+    const ativa = (t) => (teclasPressionadas[t] || 0) > 0;
+
+    const cima     = ativa("w") || ativa("arrowup");
+    const baixo    = ativa("s") || ativa("arrowdown");
+    const esquerda = ativa("a") || ativa("arrowleft");
+    const direita  = ativa("d") || ativa("arrowright");
+
+    let dx = 0, dy = 0;
+    if (cima && !baixo)       dy = -1;
+    if (baixo && !cima)       dy =  1;
+    if (esquerda && !direita) dx = -1;
+    if (direita && !esquerda) dx =  1;
+
+    if (dx !== 0 && dy !== 0) {
+        const tsH = Math.max(
+            dx < 0 ? (teclasPressionadas.a          || 0) : 0,
+            dx < 0 ? (teclasPressionadas.arrowleft  || 0) : 0,
+            dx > 0 ? (teclasPressionadas.d          || 0) : 0,
+            dx > 0 ? (teclasPressionadas.arrowright || 0) : 0
+        );
+        const tsV = Math.max(
+            dy < 0 ? (teclasPressionadas.w          || 0) : 0,
+            dy < 0 ? (teclasPressionadas.arrowup    || 0) : 0,
+            dy > 0 ? (teclasPressionadas.s          || 0) : 0,
+            dy > 0 ? (teclasPressionadas.arrowdown  || 0) : 0
+        );
+        if (tsH >= tsV) dy = 0;
+        else            dx = 0;
+    }
+
+    return { dx, dy };
+}
+
+function tentarMover() {
+    if (!jogadorElemento) return;
+
+    const agora = Date.now();
+    if (agora - ultimoTempoMovimento < DELAY_MOVIMENTO) return;
+
+    // 1) Fila de toques rápidos
+    while (filaInputs.length > 0) {
+        const input = filaInputs.shift();
+        if (agora - input.criadoEm > EXPIRACAO_INPUT) continue;
+
+        // ✅ só paga cooldown se moveu de fato
+        if (moverJogador(input.dx, input.dy)) {
+            ultimoTempoMovimento = agora;
+        }
+        return;
+    }
+
+    // 2) Teclas fisicamente seguradas
+    const { dx, dy } = calcularDirecaoSegurada();
+    if (dx !== 0 || dy !== 0) {
+        if (moverJogador(dx, dy)) {
+            ultimoTempoMovimento = agora;
+        }
+    }
+}
+
+// Tecla pressionada
 document.addEventListener("keydown", (evento) => {
-    // Ignora se o usuário está digitando num input (ex.: a chave da API)
     const tag = evento.target.tagName;
     if (tag === "INPUT" || tag === "TEXTAREA") return;
 
-    let moveu = true;
-    switch (evento.key.toLowerCase()) {
-        case "w": case "arrowup":    moverJogador(0, -1); break;
-        case "s": case "arrowdown":  moverJogador(0,  1); break;
-        case "a": case "arrowleft":  moverJogador(-1, 0); break;
-        case "d": case "arrowright": moverJogador( 1, 0); break;
-        default: moveu = false;
+    const tecla = evento.key.toLowerCase();
+    const dir = TECLAS_MOVIMENTO[tecla];
+    if (!dir) return;
+
+    evento.preventDefault();
+
+    // Ignora auto-repeat do sistema operacional
+    if ((teclasPressionadas[tecla] || 0) > 0) return;
+
+    teclasPressionadas[tecla] = Date.now();
+
+    if (filaInputs.length < MAX_FILA) {
+        filaInputs.push({ dx: dir.dx, dy: dir.dy, criadoEm: Date.now() });
     }
 
-    // Evita que as setas rolem a página
-    if (moveu) evento.preventDefault();
+    tentarMover();
 });
+
+// Tecla solta
+document.addEventListener("keyup", (evento) => {
+    const tag = evento.target.tagName;
+    if (tag === "INPUT" || tag === "TEXTAREA") return;
+
+    const tecla = evento.key.toLowerCase();
+    if (!TECLAS_MOVIMENTO[tecla]) return;
+
+    teclasPressionadas[tecla] = 0;
+    evento.preventDefault();
+});
+
+// Loop contínuo (para segurar tecla)
+setInterval(tentarMover, 16);
+
+
+
+
 // Adicionando spritesheets
 // adicionarSpriteAnimado(mapa[0][0], "cavaleiro-idle", 2)
 // adicionarSpriteAnimado(mapa[0][2], "demon-idle", 2)
