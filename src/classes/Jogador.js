@@ -1,4 +1,4 @@
-import { Personagem } from "./Personagem";
+import { Personagem } from "./Personagem.js";
 
 export class Jogador extends Personagem {
     // Atributo privado para segurança.

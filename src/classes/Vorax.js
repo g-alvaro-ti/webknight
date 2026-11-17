@@ -1,4 +1,4 @@
-import { Inimigo } from "./Inimigo";
+import { Inimigo } from "./Inimigo.js";
 
 export class Vorax extends Inimigo {
     constructor() {
