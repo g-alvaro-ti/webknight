@@ -33,11 +33,16 @@ function gerar_prompt_mapa(lista_regiao){
     ${JOGADOR} = Jogador
 
     REGRAS:
-    - Exatamente um jogador e uma saída.
-    - Pelo menos um inimigo.
-    - Todos os inimigos devem ser alcançáveis pelo jogador
-        através de pisos caminháveis.
-    - Utilize somente os valores da legenda.
+    - A matriz DEVE conter exatamente 1 jogador (${JOGADOR}).
+    - A matriz DEVE conter exatamente 1 saída (${SAIDA}).
+    - A matriz DEVE conter NO MÍNIMO 1 inimigo (${INIMIGO}), podendo conter vários.
+    - É PROIBIDO gerar um mapa sem inimigos.
+    - É PROIBIDO gerar mais de um jogador.
+    - É PROIBIDO gerar mais de uma saída.
+    - O jogador, a saída e os inimigos devem ocupar posições distintas.
+    - Todos os elementos devem ser posicionados em células caminháveis.
+    - A quantidade de inimigos deve variar aleatoriamente, respeitando o espaço disponível.
+    - Evite concentrar todos os inimigos em uma mesma região.
     - Não coloque paredes nas bordas da matriz. Coloque e distribua-as de forma criativa.
 
     A descrição deve ter no máximo 3 linhas e resumir
@@ -126,10 +131,11 @@ async function chamar_gemini(prompt) {
         const texto = dados.candidates?.[0]?.content?.parts
             ?.map(parte => parte.text ?? "")
             .join("");
+            console.log("Sucesso");
         return texto || "O Gemini não retornou um texto.";
 
     } catch (erro) {
-        console.error("Erro ao chamar a API:", erro);
+        console.error("Erro ao chamar a API:", erro.message);
         throw erro;
     }    
 }
