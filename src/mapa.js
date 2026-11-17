@@ -206,6 +206,10 @@ function gerarMapa(matriz_mapa, tipo_cenario) {
     // Notifica o painel que o mapa foi totalmente gerado,
     // atualizando a região exibida e incrementando o contador de mapas visitados.
     if (typeof notificarMudancaMapa === "function") notificarMudancaMapa(tipo_cenario);
+
+    // Atualiza a indicação de localização na tela do jogo
+    const elLocalizacao = document.querySelector(".jogo-localizacao");
+    if (elLocalizacao) elLocalizacao.textContent = tipo_cenario;
 }
 
 // Teste para sempre carregar a página com um mapa padrão,
@@ -225,6 +229,7 @@ if(mapaTestePadrao == true){
 }
 
 function moverJogador(dx, dy) {
+    if (carregandoMapa) return false;
     if (!jogadorElemento) return false;
 
     const novaLinha  = jogadorPosicao.linha  + dy;
@@ -236,7 +241,9 @@ function moverJogador(dx, dy) {
     const celulaDestino = mapa[novaLinha][novaColuna];
 
     if (celulaDestino.dataset.tipo === "parede") return false;
-    if (celulaDestino.dataset.tipo === "inimigo") return false;
+
+    const eraInimigo = celulaDestino.dataset.tipo === "inimigo";
+    const eraSaida   = celulaDestino.dataset.tipo === "saida";
 
     if (dy < 0) direcaoAtual = "cima";
     if (dy > 0) direcaoAtual = "baixo";
@@ -277,6 +284,13 @@ function moverJogador(dx, dy) {
         );
         jogadorElemento.classList.add("cavaleiro-idle");
     }, 200);
+
+    // Pessoa 8 (Breno Oliveira) — Detecção de encontros com inimigo e alcance da saída
+    if (eraInimigo) {
+        detectarEncontroInimigo(novaLinha, novaColuna, celulaDestino);
+    } else if (eraSaida) {
+        detectarSaida(novaLinha, novaColuna);
+    }
 
     return true;
 }
@@ -387,6 +401,7 @@ function calcularDirecaoSegurada() {
 }
 
 function tentarMover() {
+    if (carregandoMapa) return;
     if (!jogadorElemento) return;
 
     const agora = Date.now();
@@ -458,3 +473,82 @@ setInterval(tentarMover, 16);
 // Adicionando imagens paradas
 // adicionarCamada(mapa[1][0], SPRITE_PLAYER, 2);
 // adicionarCamada(mapa[1][2], SPRITE_DEMON, 2);
+
+// ============================================================
+// Pessoa 8 (Breno Oliveira) — Detecção de encontros e troca de mapas
+// ============================================================
+
+let carregandoMapa = false;
+
+// 1. Detectar quando o jogador entra em uma célula com inimigo
+// 2. Exibir uma mensagem no console indicando o encontro, sem implementar batalhas
+function detectarEncontroInimigo(linha, coluna, celula) {
+    console.log(`⚔️ [Encontro] O jogador entrou em uma célula com um inimigo na posição [${linha}, ${coluna}]! (Batalhas não implementadas nesta etapa)`);
+}
+
+// 3. Detectar quando o jogador alcança a saída
+function detectarSaida(linha, coluna) {
+    console.log(`🏁 [Saída] O jogador alcançou a saída na posição [${linha}, ${coluna}]! Solicitando novo mapa e nova narrativa...`);
+    trocarDeMapa();
+}
+
+// 4. Solicitar um novo mapa e uma nova narrativa
+// 5. Atualizar a tela com o novo mapa, preservando as estatísticas da sessão
+async function trocarDeMapa() {
+    if (carregandoMapa) return;
+    carregandoMapa = true;
+
+    // Esvazia fila de movimentos para evitar passos residuais durante o carregamento
+    filaInputs.length = 0;
+
+    try {
+        const cenarioAtual = (typeof dadosLocalizacao !== "undefined" && dadosLocalizacao.regiao)
+            ? dadosLocalizacao.regiao
+            : "Floresta";
+
+        const proximoCenario = (typeof obterProximoCenario === "function")
+            ? obterProximoCenario(cenarioAtual)
+            : cenario_aleatorio(lista_regiao);
+
+        const numeroProximoMapa = (typeof dadosLocalizacao !== "undefined" && dadosLocalizacao.mapasVisitados)
+            ? dadosLocalizacao.mapasVisitados + 1
+            : 2;
+
+        console.log(`🔄 [Troca de Mapa] Carregando Mapa #${numeroProximoMapa} — Região: ${proximoCenario}...`);
+
+        // Feedback imediato na tela
+        const elNarrativa = document.querySelector(".jogo-narrativa");
+        if (elNarrativa) {
+            elNarrativa.textContent = `Avançando para ${proximoCenario}... Carregando novo mapa e narrativa...`;
+        }
+
+        // Solicita o novo mapa e a nova narrativa
+        const [dadosMapa, novaNarrativa] = await Promise.all([
+            solicitarNovoMapa(proximoCenario),
+            solicitarNovaNarrativa(proximoCenario, numeroProximoMapa)
+        ]);
+
+        // Atualiza a tela com o novo mapa e narrativa, preservando as estatísticas da sessão
+        atualizarTelaComNovoMapa(dadosMapa.matriz_mapa, dadosMapa.tipo_cenario, novaNarrativa);
+
+    } catch (erro) {
+        console.error("Erro durante a troca de mapas:", erro);
+    } finally {
+        carregandoMapa = false;
+    }
+}
+
+function atualizarTelaComNovoMapa(matrizMapa, tipoCenario, novaNarrativa) {
+    // 1. Gera o novo mapa visualmente na tela (recria as células e posiciona o jogador)
+    // notificarMudancaMapa() é acionada internamente em gerarMapa(), incrementando mapasVisitados
+    // e preservando os atributos do jogador no painel lateral
+    gerarMapa(matrizMapa, tipoCenario);
+
+    // 2. Atualiza a narrativa na tela
+    const elNarrativa = document.querySelector(".jogo-narrativa");
+    if (elNarrativa && novaNarrativa) {
+        elNarrativa.textContent = novaNarrativa;
+    }
+
+    console.log(`✅ [Tela Atualizada] Novo mapa [${tipoCenario}] carregado na tela. Narrativa atualizada e estatísticas da sessão preservadas com sucesso!`);
+}
