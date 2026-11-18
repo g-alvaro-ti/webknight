@@ -259,8 +259,8 @@
 
     gap: 26px;
 
-    flex: 0 0 38%;
-    min-width: 280px;
+    flex: 0 0 44%;
+    min-width: 320px;
 
     text-align: center;
     color: white;
@@ -269,25 +269,28 @@
 
 /* Encurta a distância entre o título e a descrição */
 .inicio-menu h1 {
-    margin-bottom: -10px;
+    margin-bottom: -12px;
 }
 
 .inicio-menu h1 {
-    font-size: clamp(40px, 5vw, 68px);
+    font-size: clamp(48px, 6vw, 80px);
     color: #f4d58d;
 }
 
 .inicio-menu p {
-    font-size: 18px;
+    font-size: clamp(19px, 1.7vw, 24px);
     line-height: 1.9;
 }
 
 /* Botões principais do menu (jogar e configurações) */
 .btn-menu-principal {
-    padding: 13px 24px;
+    width: 100%;
+    max-width: 360px;
+
+    padding: clamp(16px, 1.6vw, 22px) 28px;
 
     font-family: 'Silkscreen', monospace;
-    font-size: 13px;
+    font-size: clamp(15px, 1.4vw, 18px);
 
     color: white;
     background-color: #751e2b;
@@ -613,8 +616,15 @@
 
 .botoes-modal-jogar {
     display: flex;
-    flex-direction: column;
-    gap: 14px;
+    gap: 12px;
+}
+
+/* Pergunta do modal do botão jogar */
+.pergunta-gemini {
+    margin-bottom: 24px;
+
+    font-size: 14px;
+    line-height: 1.8;
 }
 
 /* Erro quando não existe chave cadastrada */
@@ -733,16 +743,16 @@
     }
 
     .inicio-menu h1 {
-        font-size: clamp(22px, 4vw, 36px);
+        font-size: clamp(30px, 5vw, 44px);
     }
 
     .inicio-menu p {
-        font-size: 12px;
+        font-size: 15px;
     }
 
     .btn-menu-principal {
-        padding: 10px 16px;
-        font-size: 10px;
+        padding: 15px 18px;
+        font-size: 14px;
     }
 }
 
@@ -796,17 +806,17 @@
     }
 
     .inicio-menu h1 {
-        font-size: 28px;
+        font-size: 34px;
         margin-bottom: -4px;
     }
 
     .inicio-menu p {
-        font-size: 11px;
+        font-size: 13px;
     }
 
     .btn-menu-principal {
-        padding: 9px 13px;
-        font-size: 9px;
+        padding: 13px 14px;
+        font-size: 12px;
     }
 
     /* Modais */

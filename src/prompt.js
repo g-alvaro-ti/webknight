@@ -11,8 +11,8 @@ const MONTANHA = "Montanha";
 
 const lista_regiao = [FLORESTA,CIDADE,RUINA,MONTANHA];
 
-let botaoModalGerarMapa = document.querySelector("#btn-modal-gerar-mapa")
-let botaoModalGerarNarrativa = document.querySelector("#btn-modal-gerar-narrativa")
+let botaoModalGeminiSim = document.querySelector("#btn-modal-gemini-sim")
+let botaoModalGeminiNao = document.querySelector("#btn-modal-gemini-nao")
 let mensagemErroSemChave = document.querySelector("#erro-sem-chave")
 let mensagemSucessoGemini = document.querySelector("#mensagem-sucesso")
 let animacaoGemini = document.querySelector("#animacao-gemini")
@@ -163,7 +163,9 @@ async function chamar_gemini(prompt) {
     }    
 }
 
-// Gera um mapa com o Gemini (cenario sorteado) e monta a nova tela do mapa
+// Gera um mapa com o Gemini (cenario sorteado) e monta a nova tela do mapa.
+// Retorna o resultado completo (tipo_cenario, descricao, matriz_mapa) pra
+// alimentar a narrativa logo em seguida.
 async function gerarMapaGemini() {
     console.log("Resultado do prompt:");
 
@@ -179,28 +181,80 @@ async function gerarMapaGemini() {
         resultado.matriz_mapa,
         resultado.tipo_cenario
     );
+
+    return resultado;
 }
 
-// Botão de gerar mapa do modal do botão jogar
-botaoModalGerarMapa.addEventListener("click", async function() {
+// Textos de abertura padrão, usados quando a história não é gerada pelo Gemini
+const NARRATIVAS_PADRAO = {
+    "Floresta": "Você acordou em uma FLORESTA escura, sem saber como chegou ali. Ao seu redor, você vê árvores altas e sombras misteriosas. De repente, você ouve um rugido distante e percebe que não está sozinho.",
+    "Cidade": "Você desperta no meio de uma CIDADE abandonada. Prédios em silêncio, ruas vazias e olhos que você sente observando por trás das janelas. Algo se move no fim da avenida.",
+    "Ruina": "Você caminha por RUÍNAS de pedra rachadas pelo tempo. Ecos de um império esquecido cercam o caminho, e o barulho de passos que não são os seus chega de dentro das cavernas.",
+    "Montanha": "O vento gélido da MONTANHA corta seu rosto enquanto você escala o caminho estreito. Abaixo, o abismo. Acima, criaturas se movem entre as rochas, esperando um passo em falso seu."
+};
+
+// Geração padrão: sorteia o cenário, monta o mapa padrão local e
+// exibe o texto de abertura correspondente. Tudo sem depender da API.
+function gerarMapaPadrao() {
+    const cenario = cenario_aleatorio(lista_regiao);
+    const matrizPadrao = MAPAS_PADRAO[cenario] || MAPAS_PADRAO[FLORESTA];
+
+    gerarMapa(matrizPadrao.map(linha => [...linha]), cenario);
+    exibirNarrativa(NARRATIVAS_PADRAO[cenario]);
+}
+
+// Caminho escolhido no modal do botão jogar: mapa e história gerados pelo Gemini.
+// Em qualquer falha (sem chave, conexão ou resposta inválida), mostra o erro
+// e permanece no modal: só entra no jogo se o Gemini gerar com sucesso.
+botaoModalGeminiSim.addEventListener("click", async () => {
     mensagemErroSemChave.hidden = true;
     mensagemSucessoGemini.hidden = true;
 
     if (!temChaveCadastrada()) return;
 
-    botaoModalGerarMapa.disabled = true; // evita cliques repetidos enquanto a API responde
-    exibirAnimacaoGemini("Gerando mapa...");
+    botaoModalGeminiSim.disabled = true; // evita cliques repetidos enquanto a API responde
+    botaoModalGeminiNao.disabled = true;
+    exibirAnimacaoGemini("Gerando mapa e história...");
 
     try {
-        await gerarMapaGemini();
-        mensagemSucessoGemini.textContent = "Mapa gerado com sucesso!";
-        mensagemSucessoGemini.hidden = false;
+        // Gera primeiro o mapa, depois a história com base no cenário e
+        // na descrição devolvidos pelo Gemini
+        const resultadoMapa = await gerarMapaGemini();
+
+        try {
+            await solicitarNovaNarrativa(
+                resultadoMapa.tipo_cenario,
+                0,
+                resultadoMapa.descricao || ""
+            );
+        } catch (erroNarrativa) {
+            console.warn("Falha na narrativa do Gemini; usando texto padrão.", erroNarrativa);
+            exibirNarrativa(NARRATIVAS_PADRAO[resultadoMapa.tipo_cenario]);
+        }
+
+        // Mapa e história prontos: fecha o modal e entra na tela do jogo
+        entrarNoJogo();
     } catch (erro) {
-        console.error("Erro ao gerar o mapa:", erro);
+        console.error("Erro ao gerar o mapa e a história com o Gemini:", erro);
+        mensagemErroSemChave.textContent = "Não foi possível gerar o mapa e a história. Verifique sua conexão/chave e tente novamente.";
+        mensagemErroSemChave.hidden = false;
     } finally {
-        botaoModalGerarMapa.disabled = false;
+        botaoModalGeminiSim.disabled = false;
+        botaoModalGeminiNao.disabled = false;
         esconderAnimacaoGemini();
     }
+});
+
+// Caminho escolhido no modal do botão jogar: geração padrão, sem o Gemini.
+// Mapa padrão local + texto de abertura padrão, tudo sem chamar a API.
+botaoModalGeminiNao.addEventListener("click", () => {
+    mensagemErroSemChave.hidden = true;
+    mensagemSucessoGemini.hidden = true;
+
+    gerarMapaPadrao();
+
+    // Fecha o modal e entra na tela do jogo
+    entrarNoJogo();
 });
 
 // ============================================================
@@ -409,8 +463,9 @@ async function gerarNarrativa({ tipoCenario = "Floresta", descricaoMapa = "", fo
     return { texto, ehChefe, usouFallback, regiaoFallback };
 }
 
-// Ponto de entrada da narrativa para o resto do jogo (mantém o nome que o código do mapa já usava).
-// Já exibe o texto na tela, com animação, e também o retorna.
+// ------------------------------------------------------------
+
+// Gera a narrativa do cenário atual e mostra na tela do jogo.
 // "descricaoMapa" é a descricao que o Gemini devolve junto com o mapa (opcional).
 // "mapasVisitados" não é mais usado: a Narrativa conta as transições sozinha.
 async function solicitarNovaNarrativa(cenario, mapasVisitados, descricaoMapa = "") {
@@ -418,41 +473,3 @@ async function solicitarNovaNarrativa(cenario, mapasVisitados, descricaoMapa = "
     const { texto } = await gerarNarrativa({ tipoCenario: cenario, descricaoMapa });
     return texto;
 }
-
-// ------------------------------------------------------------
-
-// Gera a narrativa do cenário atual e mostra na tela do jogo.
-// Usada pelo botão "Gerar Narrativa" do modal do botão jogar.
-async function gerarNarrativaGemini() {
-    // Usa a região do mapa que está na tela (guardada pelo painel-jogador.js).
-    // Se não existir, sorteia uma.
-    const regiao = (typeof dadosLocalizacao !== "undefined" && dadosLocalizacao.regiao)
-        ? dadosLocalizacao.regiao
-        : cenario_aleatorio(lista_regiao);
-
-    const texto = await solicitarNovaNarrativa(regiao, 0, "Cenário de teste, sem mapa associado.");
-    console.log("Narrativa gerada:", texto);
-    return texto;
-}
-
-// Botão de gerar narrativa do modal do botão jogar
-botaoModalGerarNarrativa.addEventListener("click", async () => {
-    mensagemErroSemChave.hidden = true;
-    mensagemSucessoGemini.hidden = true;
-
-    if (!temChaveCadastrada()) return;
-
-    botaoModalGerarNarrativa.disabled = true; // evita cliques repetidos enquanto a API responde
-    exibirAnimacaoGemini("Escrevendo narrativa...");
-
-    try {
-        await gerarNarrativaGemini();
-        mensagemSucessoGemini.textContent = "Narrativa gerada com sucesso!";
-        mensagemSucessoGemini.hidden = false;
-    } catch (erro) {
-        console.error("Erro ao gerar narrativa:", erro);
-    } finally {
-        botaoModalGerarNarrativa.disabled = false;
-        esconderAnimacaoGemini();
-    }
-});

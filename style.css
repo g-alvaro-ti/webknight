@@ -23,6 +23,12 @@ section {
     border-bottom: 2px solid black;
 }
 
+/* Respeita o atributo hidden em qualquer seção, mesmo quando o CSS da tela
+   (ex.: #tela-inicial) define display com seletor de ID */
+section[hidden] {
+    display: none !important;
+}
+
 /* Usado pra esconder telas, ou elementos específicos da página */
 /* Exemplo no JS: elementoHTML.classList.toggle("hidden",true) */
 .hidden {

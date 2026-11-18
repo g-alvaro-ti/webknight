@@ -106,17 +106,18 @@
                 <button class="btn-fechar" data-fechar="modal-jogar">X</button>
                 <h2>WEBKNIGHT</h2>
 
+                <p class="pergunta-gemini">O mapa e história devem ser gerados pelo Gemini?</p>
+
                 <div class="botoes-modal-jogar">
-                    <button id="btn-modal-gerar-mapa" class="btn-modal">GERAR MAPA COM GEMINI</button>
-                    <button id="btn-modal-gerar-narrativa" class="btn-modal">GERAR NARRATIVA</button>
-                    <button id="btn-continuar" class="btn-modal">CONTINUAR</button>
+                    <button id="btn-modal-gemini-sim" class="btn-modal">SIM</button>
+                    <button id="btn-modal-gemini-nao" class="btn-modal btn-secundario">NÃO</button>
                 </div>
 
                 <p id="erro-sem-chave" class="mensagem-erro" hidden>Configure uma chave da API do Gemini no menu de configurações antes de gerar.</p>
 
                 <p id="mensagem-sucesso" class="mensagem-sucesso" hidden></p>
 
-                <!-- Animação da logo do Gemini enquanto o mapa ou a narrativa são gerados -->
+                <!-- Animação da logo do Gemini enquanto o mapa e a história são gerados -->
                 <div id="animacao-gemini" class="animacao-gemini" hidden>
                     <img class="logo-gemini-girando" src="assets/img/logotypes/Google_Gemini_icon.svg" alt="Logo do Gemini girando">
                     <span id="texto-animacao-gemini">Gerando...</span>
@@ -126,7 +127,7 @@
     </section>
 
     <!-- Tela com o mapa do jogo, jogador e inimigos -->
-    <section id="tela-jogo">
+    <section id="tela-jogo" hidden>
         <div class="jogo-container">
             <div class="jogo-localizacao">
                 Floresta
@@ -141,12 +142,12 @@
     </section>
 
     <!-- Interface da batalha de turnos -->
-    <section id="tela-batalha">
+    <section id="tela-batalha" hidden>
 
     </section>
 
     <!-- Tela de fim pra quando perder, contendo o placar de líderes dos jogadores -->
-    <section id="tela-fim">
+    <section id="tela-fim" hidden>
 
     </section>
 

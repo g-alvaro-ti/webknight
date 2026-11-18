@@ -3,24 +3,40 @@ function inicio(){
     
 }
 
+let modalJogar = null;
+
 function exibirTelaInicial(estado){
     telaInicial = document.querySelector("#tela-inicial");
-    telaInicial.classList.toggle("hidden", estado)
+    telaInicial.hidden = estado
 }
 
 function exibirJogo(estado){
     jogo = document.querySelector("#tela-jogo");
-    jogo.classList.toggle("hidden", estado)
+    jogo.hidden = estado
 }
 
 function exibirBatalhaTurno(estado){
     batalhaTurno = document.querySelector("#tela-batalha");
-    batalhaTurno.classList.toggle("hidden", estado)
+    batalhaTurno.hidden = estado
 }
 
 function exibirTelaFinal(estado){
     telaFinal = document.querySelector("#tela-fim");
-    telaFinal.classList.toggle("hidden", estado)
+    telaFinal.hidden = estado
+}
+
+// Fecha o modal de jogar e faz a troca da tela inicial pra tela do jogo
+function entrarNoJogo(){
+    modalJogar.hidden = true;
+
+    // Esconde a tela inicial
+    exibirTelaInicial(true);
+
+    // Mostra a tela do jogo
+    exibirJogo(false);
+
+    // Garante que a tela do jogo comece visível do topo
+    window.scrollTo(0, 0);
 }
 
 // Inicialização das telas
@@ -31,31 +47,18 @@ document.addEventListener("DOMContentLoaded", () => {
     exibirBatalhaTurno(true);
     exibirTelaFinal(true);
 
+    // Garante que a página abra sempre na tela inicial, sem rolagem residual
+    window.scrollTo(0, 0);
+
     // Evento do botão iniciar
+    modalJogar = document.querySelector("#modal-jogar");
     const botaoIniciar = document.querySelector("#btn-iniciar");
-    const modalJogar = document.querySelector("#modal-jogar");
-    const botaoContinuar = document.querySelector("#btn-continuar");
 
     if (botaoIniciar) {
         botaoIniciar.addEventListener("click", () => {
 
             // Mostra o modal com as opções antes de entrar no jogo
             modalJogar.hidden = false;
-
-        });
-    }
-
-    // Continuar fecha o modal e entra na tela do jogo
-    if (botaoContinuar) {
-        botaoContinuar.addEventListener("click", () => {
-
-            modalJogar.hidden = true;
-
-            // Esconde a tela inicial
-            exibirTelaInicial(true);
-
-            // Mostra a tela do jogo
-            exibirJogo(false);
 
         });
     }
