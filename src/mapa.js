@@ -63,6 +63,13 @@ const CORES_REGIOES = {
     }
 };
 
+const INIMIGOS_REGIOES = {
+    "Floresta": "orc-idle",
+    "Cidade":   "orc-idle",
+    "Ruina":    "monster-idle",
+    "Montanha": "demon-idle"
+};
+
 // Função para injetar uma imagem estática em uma célula específica
 function adicionarCamada(celula, caminhoImagem, ordemZ = 1) {
     const img = document.createElement("img");
@@ -143,8 +150,9 @@ function gerarMapa(matriz_mapa, tipo_cenario) {
     jogadorElemento = null;
     jogadorPosicao  = { linha: 0, coluna: 0 };  
 
-    // Obtém as cores correspondentes à região
+    // Obtém as cores e o sprite de inimigo correspondentes à região
     const cores = CORES_REGIOES[tipo_cenario];
+    const classeInimigo = INIMIGOS_REGIOES[tipo_cenario] || "demon-idle";
 
     if (!cores) {
         console.error("Cenário desconhecido:", tipo_cenario);
@@ -192,13 +200,13 @@ function gerarMapa(matriz_mapa, tipo_cenario) {
                     celula.dataset.tipo = "parede"
                     
                     // Adicionando um objeto decorativo
-                    adicionarCamada(celula, OBJECT_TREE, 2);
+                    // adicionarCamada(celula, OBJECT_TREE, 2);
                     break;
                 case 3: // Inimigo
                     celula.style.backgroundColor = cores[3];
                     celula.dataset.tipo = "inimigo"
 
-                    const spriteInimigo = adicionarSpriteAnimado(celula, "demon-idle", 2)
+                    const spriteInimigo = adicionarSpriteAnimado(celula, classeInimigo, 2)
 
                     // Guarda o inimigo com sua posição e elemento,
                     // pra poder movimentá-lo sem recriar o sprite depois
