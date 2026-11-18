@@ -27,9 +27,9 @@ function exibirTelaFinal(estado){
 document.addEventListener("DOMContentLoaded", () => {
 
     // Esconde as telas que não devem aparecer inicialmente
-    exibirJogo(false);
-    exibirBatalhaTurno(false);
-    exibirTelaFinal(false);
+    exibirJogo(true);
+    exibirBatalhaTurno(true);
+    exibirTelaFinal(true);
 
     // Evento do botão iniciar
     const botaoIniciar = document.querySelector("#btn-iniciar");

@@ -21,49 +21,6 @@ Você acorda em uma floresta escura sem saber como chegou ali. Explore o mapa, e
 - **Painel do jogador** lateral com atributos (vida, força, defesa, velocidade), região atual e contador de mapas visitados, colapsável em telas pequenas.
 - **Classes de personagem** com herança (`Personagem` → `Jogador`, `Personagem` → `Inimigo` → `Vorax`), com atributos privados e getters/seters, prontas pra alimentar as batalhas em turnos.
 
-## Estrutura do projeto
-
-```
-webknight/
-├── index.html                    Página com as quatro telas do jogo
-├── style.css                     Estilos globais
-├── css/
-│   ├── tela-inicio.css           Tela inicial
-│   ├── tela-jogo.css             Tela de jogo e mapa
-│   ├── tela-batalha.css          Batalha em turnos
-│   ├── tela-fim.css              Tela de fim com placar de líderes
-│   ├── painel-jogador.css        Painel lateral do jogador
-│   └── sprites.css               Spritesheets animadas (cavaleiro, demônio)
-├── src/
-│   ├── script.js                 Controle de exibição das telas
-│   ├── prompt.js                 Comunicação com o Gemini pra gerar mapas
-│   ├── mapa.js                   Renderização do mapa e movimentação (jogador e inimigos)
-│   ├── painel-jogador.js         Painel de informações do jogador
-│   └── classes/
-│       ├── Personagem.js         Classe base abstrata
-│       ├── Jogador.js            Personagem do jogador
-│       ├── Inimigo.js            Classe base dos oponentes
-│       ├── Vorax.js              Especialização de inimigo
-│       └── Narrativa.js          Narrativa do jogo
-├── sprites/                      Imagens e spritesheets (soldado, demônio, cenário)
-└── assets/                       Áudios (em preparação)
-```
-
-## Como rodar
-
-O projeto não tem build nem dependências — é só servir a pasta por um servidor HTTP local e abrir no navegador:
-
-```bash
-# Com Python
-python -m http.server 8000
-# Ou com Node
-npx serve .
-```
-
-Depois acesse `http://localhost:8000`.
-
-> Abrir o `index.html` direto pelo disco (sem servidor) funciona pra ver o mapa, mas o navegador bloqueia a chamada à API do Gemini por `file://`.
-
 ## Controles
 
 | Tecla                  | Ação                            |
@@ -73,18 +30,6 @@ Depois acesse `http://localhost:8000`.
 | `A` / `←`              | Mover pra esquerda              |
 | `D` / `→`              | Mover pra direita               |
 | Segurar a tecla        | Caminha continuamente           |
-
-## Legenda do mapa
-
-A matriz que descreve cada mapa (gerada pelo Gemini ou fixa nos testes) usa estes valores:
-
-| Valor | Célula  | Comportamento                                              |
-| ----- | ------- | ---------------------------------------------------------- |
-| `0`   | Piso    | Caminhável                                                 |
-| `1`   | Saída   | Avança pra próxima região                                  |
-| `2`   | Parede  | Intransponível                                             |
-| `3`   | Inimigo | Bloqueia o jogador; o inimigo se move sozinho pelo mapa    |
-| `4`   | Jogador | Posição inicial do jogador                                 |
 
 ## Em desenvolvimento
 
