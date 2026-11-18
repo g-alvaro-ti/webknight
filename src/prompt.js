@@ -84,14 +84,47 @@ function gerar_prompt_mapa(lista_regiao){
     return prompt;
 }
 
-async function chamar_gemini(prompt) {
-    const API_KEY = proximaChaveGemini();
-    if (!API_KEY) {
-        throw new Error("Nenhuma chave da API do Gemini cadastrada nas configurações.");
+function exibirMapaCarregamento() {
+    const container = document.querySelector(".jogo-mapa-container");
+    if (!container) return;
+
+    container.innerHTML = "";
+    if (typeof inimigos !== "undefined") inimigos.length = 0;
+    if (typeof jogadorElemento !== "undefined") jogadorElemento = null;
+
+    const linhas = 10;
+    const colunas = 15;
+    const linhaJogador = 4;
+    const colunaJogador = 7;
+    const linhaPontos = 6;
+    const colunasPontos = [5, 7, 9];
+
+    for (let i = 0; i < linhas; i++) {
+        for (let j = 0; j < colunas; j++) {
+            const celula = document.createElement("div");
+            celula.classList.add("mapa-celula");
+
+            const ehPonto = i === linhaPontos && colunasPontos.includes(j);
+            celula.style.backgroundColor = ehPonto ? "#FFFFFF" : "#31081f";
+
+            if (i === linhaJogador && j === colunaJogador) {
+                adicionarSpriteAnimado(celula, "cavaleiro-idle", 2);
+            }
+
+            container.appendChild(celula);
+        }
     }
+}
+
+async function chamar_gemini(prompt) {
+    exibirMapaCarregamento();
+    const API_KEY = proximaChaveGemini();
     const MODELO = "gemini-3.5-flash";
     const URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODELO}:generateContent`;
     try {
+        if (!API_KEY) {
+            throw new Error("Chave de API não informada.");
+        }
         const resposta = await fetch(URL, {
             method: "POST",
             headers: {
@@ -164,20 +197,27 @@ async function chamar_gemini(prompt) {
 }
 
 // Gera um mapa com o Gemini (cenario sorteado) e monta a nova tela do mapa
-async function gerarMapaGemini() {
+async function gerarMapaGemini(cenarioSorteado = cenario_aleatorio(lista_regiao)) {
     console.log("Resultado do prompt:");
 
-    const texto = gerar_prompt_mapa(lista_regiao);
+    const texto = gerar_prompt_mapa([cenarioSorteado]);
     const resposta_prompt = await chamar_gemini(texto);
 
     console.log(resposta_prompt);
 
     const resultado = JSON.parse(resposta_prompt);
+    if (!resultado || !Array.isArray(resultado.matriz_mapa)) {
+        throw new Error("Matriz de mapa inválida retornada pelo Gemini.");
+    }
+
+    const cenarioFinal = (typeof CORES_REGIOES !== "undefined" && CORES_REGIOES[resultado.tipo_cenario])
+        ? resultado.tipo_cenario
+        : cenarioSorteado;
 
     // Gera o mapa no HTML, com a função do mapa.js
     gerarMapa(
         resultado.matriz_mapa,
-        resultado.tipo_cenario
+        cenarioFinal
     );
 }
 
@@ -190,13 +230,19 @@ botaoModalGerarMapa.addEventListener("click", async function() {
 
     botaoModalGerarMapa.disabled = true; // evita cliques repetidos enquanto a API responde
     exibirAnimacaoGemini("Gerando mapa...");
+    const cenarioSorteado = cenario_aleatorio(lista_regiao);
 
     try {
-        await gerarMapaGemini();
+        await gerarMapaGemini(cenarioSorteado);
         mensagemSucessoGemini.textContent = "Mapa gerado com sucesso!";
         mensagemSucessoGemini.hidden = false;
     } catch (erro) {
-        console.error("Erro ao gerar o mapa:", erro);
+        console.warn("Falha ao gerar mapa via Gemini. Carregando mapa padrão.", erro);
+        const matrizPadrao = MAPAS_PADRAO[cenarioSorteado] || MAPAS_PADRAO["Floresta"];
+        gerarMapa(
+            matrizPadrao.map(linha => [...linha]),
+            cenarioSorteado
+        );
     } finally {
         botaoModalGerarMapa.disabled = false;
         esconderAnimacaoGemini();
@@ -273,7 +319,7 @@ async function solicitarNovoMapa(cenario) {
 
     if (temChave) {
         try {
-            console.log(`[Pessoa 8] Solicitando novo mapa via Gemini para o cenário: ${cenario}...`);
+            console.log(`Gerando mapa para: ${cenario}`);
             const prompt = gerar_prompt_mapa([cenario]);
             const respostaPrompt = await chamar_gemini(prompt);
             const resultado = JSON.parse(respostaPrompt);
@@ -285,7 +331,7 @@ async function solicitarNovoMapa(cenario) {
                 };
             }
         } catch (erro) {
-            console.warn("[Pessoa 8] Falha ao gerar mapa via Gemini. Usando mapa local de fallback.", erro);
+            console.warn("Erro ao gerar mapa, usando mapa padrão.", erro);
         }
     }
 

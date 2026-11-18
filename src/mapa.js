@@ -548,12 +548,12 @@ let carregandoMapa = false;
 // 1. Detectar quando o jogador entra em uma célula com inimigo
 // 2. Exibir uma mensagem no console indicando o encontro, sem implementar batalhas
 function detectarEncontroInimigo(linha, coluna, celula) {
-    console.log(`⚔️ [Encontro] O jogador entrou em uma célula com um inimigo na posição [${linha}, ${coluna}]! (Batalhas não implementadas nesta etapa)`);
+    console.log(`Encontro com inimigo em [${linha}, ${coluna}]`);
 }
 
 // 3. Detectar quando o jogador alcança a saída
 function detectarSaida(linha, coluna) {
-    console.log(`🏁 [Saída] O jogador alcançou a saída na posição [${linha}, ${coluna}]! Solicitando novo mapa e nova narrativa...`);
+    console.log(`Saída alcançada em [${linha}, ${coluna}]`);
     trocarDeMapa();
 }
 
@@ -579,7 +579,7 @@ async function trocarDeMapa() {
             ? dadosLocalizacao.mapasVisitados + 1
             : 2;
 
-        console.log(`🔄 [Troca de Mapa] Carregando Mapa #${numeroProximoMapa} — Região: ${proximoCenario}...`);
+        console.log(`Carregando mapa ${numeroProximoMapa} (${proximoCenario})`);
 
         // Feedback imediato na tela
         const elNarrativa = document.querySelector(".jogo-narrativa");
@@ -615,5 +615,5 @@ function atualizarTelaComNovoMapa(matrizMapa, tipoCenario, novaNarrativa) {
         elNarrativa.textContent = novaNarrativa;
     }
 
-    console.log(`✅ [Tela Atualizada] Novo mapa [${tipoCenario}] carregado na tela. Narrativa atualizada e estatísticas da sessão preservadas com sucesso!`);
+    console.log(`Novo mapa carregado: ${tipoCenario}`);
 }
