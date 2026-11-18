@@ -114,6 +114,8 @@ function exibirMapaCarregamento() {
     }
 }
 
+const TIMEOUT_MAPA_MS = 15000;
+
 async function chamar_gemini(prompt) {
     exibirMapaCarregamento();
     const API_KEY = proximaChaveGemini();
@@ -129,6 +131,7 @@ async function chamar_gemini(prompt) {
                 "Content-Type": "application/json",
                 "x-goog-api-key": API_KEY
             },
+            signal: AbortSignal.timeout(TIMEOUT_MAPA_MS),
             body: JSON.stringify({
                 contents: [
                     {
@@ -204,7 +207,7 @@ async function gerarMapaGemini(cenarioSorteado = cenario_aleatorio(lista_regiao)
     console.log(resposta_prompt);
 
     const resultado = JSON.parse(resposta_prompt);
-    if (!resultado || !Array.isArray(resultado.matriz_mapa)) {
+    if (!resultado || !mapaMatrizValida(resultado.matriz_mapa)) {
         throw new Error("Matriz de mapa inválida retornada pelo Gemini.");
     }
 
@@ -280,6 +283,28 @@ const MAPAS_PADRAO = {
     ]
 };
 
+/** Valida se a matriz possui dimensões válidas, jogador e saída. */
+function mapaMatrizValida(matriz) {
+    if (!Array.isArray(matriz) || matriz.length === 0) return false;
+    let temJogador = false;
+    let temSaida = false;
+    for (const linha of matriz) {
+        if (!Array.isArray(linha) || linha.length === 0) return false;
+        if (linha.includes(JOGADOR)) temJogador = true;
+        if (linha.includes(SAIDA)) temSaida = true;
+    }
+    return temJogador && temSaida;
+}
+
+/** Retorna uma cópia de um dos mapas padrão locais para o cenário informado. */
+function obterMapaPadrao(cenario) {
+    const cenarioValido = MAPAS_PADRAO[cenario] ? cenario : FLORESTA;
+    return {
+        matriz_mapa: MAPAS_PADRAO[cenarioValido].map(linha => [...linha]),
+        tipo_cenario: cenarioValido
+    };
+}
+
 // Retorna o próximo cenário aleatório, preferencialmente diferente do cenário atual
 function obterProximoCenario(cenarioAtual) {
     const opcoes = lista_regiao.filter(r => r !== cenarioAtual);
@@ -299,7 +324,7 @@ async function solicitarNovoMapa(cenario) {
             const respostaPrompt = await chamar_gemini(prompt);
             const resultado = JSON.parse(respostaPrompt);
 
-            if (resultado && resultado.matriz_mapa && Array.isArray(resultado.matriz_mapa)) {
+            if (resultado && mapaMatrizValida(resultado.matriz_mapa)) {
                 return {
                     matriz_mapa: resultado.matriz_mapa,
                     tipo_cenario: cenario
@@ -311,11 +336,7 @@ async function solicitarNovoMapa(cenario) {
     }
 
     // Fallback local se não houver chave ou requisição falhar
-    const matriz = MAPAS_PADRAO[cenario] || MAPAS_PADRAO["Floresta"];
-    return {
-        matriz_mapa: matriz.map(linha => [...linha]),
-        tipo_cenario: cenario
-    };
+    return obterMapaPadrao(cenario);
 }
 
 // ============================================================
@@ -434,10 +455,24 @@ async function gerarNarrativa({ tipoCenario = "Floresta", descricaoMapa = "", fo
 // Já exibe o texto na tela, com animação, e também o retorna.
 // "descricaoMapa" é a descricao que o Gemini devolve junto com o mapa (opcional).
 // "mapasVisitados" não é mais usado: a Narrativa conta as transições sozinha.
+const NARRATIVAS_FALLBACK_LOCAL = {
+    "Floresta": "Você adentra uma parte mais densa da Floresta. Sombras se movem entre as árvores à sua frente.",
+    "Cidade": "Você cruza os portões de uma Cidade silenciosa. Becos escuros escondem perigos à sua espera.",
+    "Ruina": "Você penetra nos corredores de uma Ruína ancestral. Criaturas observam sua chegada na escuridão.",
+    "Montanha": "O vento gélido ruge pelos desfiladeiros da Montanha. A trilha à frente exige cautela."
+};
+
 async function solicitarNovaNarrativa(cenario, mapasVisitados, descricaoMapa = "") {
-    await garantirNarrativa();
-    const { texto } = await gerarNarrativa({ tipoCenario: cenario, descricaoMapa });
-    return texto;
+    try {
+        await garantirNarrativa();
+        const { texto } = await gerarNarrativa({ tipoCenario: cenario, descricaoMapa });
+        return texto;
+    } catch (erro) {
+        console.warn("Erro ao solicitar narrativa, usando fallback local.", erro);
+        const textoFallback = NARRATIVAS_FALLBACK_LOCAL[cenario] || NARRATIVAS_FALLBACK_LOCAL[FLORESTA];
+        exibirNarrativa(textoFallback);
+        return textoFallback;
+    }
 }
 
 // ------------------------------------------------------------
@@ -462,11 +497,8 @@ if (botaoContinuarComGemini) {
             descricaoMapa = dadosMapa.descricao;
         } catch (erro) {
             console.warn("Falha ao gerar mapa via Gemini. Carregando mapa padrão.", erro);
-            const matrizPadrao = MAPAS_PADRAO[cenarioSorteado] || MAPAS_PADRAO["Floresta"];
-            gerarMapa(
-                matrizPadrao.map(linha => [...linha]),
-                cenarioSorteado
-            );
+            const mapaPadrao = obterMapaPadrao(cenarioSorteado);
+            gerarMapa(mapaPadrao.matriz_mapa, mapaPadrao.tipo_cenario);
         }
 
         try {

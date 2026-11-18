@@ -566,19 +566,21 @@ async function trocarDeMapa() {
     // Esvazia fila de movimentos para evitar passos residuais durante o carregamento
     filaInputs.length = 0;
 
+    const cenarioAtual = (typeof dadosLocalizacao !== "undefined" && dadosLocalizacao.regiao)
+        ? dadosLocalizacao.regiao
+        : "Floresta";
+
+    const proximoCenario = (typeof obterProximoCenario === "function")
+        ? obterProximoCenario(cenarioAtual)
+        : cenario_aleatorio(lista_regiao);
+
+    const numeroProximoMapa = (typeof dadosLocalizacao !== "undefined" && dadosLocalizacao.mapasVisitados)
+        ? dadosLocalizacao.mapasVisitados + 1
+        : 2;
+
+    let mapaAtualizado = false;
+
     try {
-        const cenarioAtual = (typeof dadosLocalizacao !== "undefined" && dadosLocalizacao.regiao)
-            ? dadosLocalizacao.regiao
-            : "Floresta";
-
-        const proximoCenario = (typeof obterProximoCenario === "function")
-            ? obterProximoCenario(cenarioAtual)
-            : cenario_aleatorio(lista_regiao);
-
-        const numeroProximoMapa = (typeof dadosLocalizacao !== "undefined" && dadosLocalizacao.mapasVisitados)
-            ? dadosLocalizacao.mapasVisitados + 1
-            : 2;
-
         console.log(`Carregando mapa ${numeroProximoMapa} (${proximoCenario})`);
 
         // Feedback imediato na tela
@@ -587,17 +589,25 @@ async function trocarDeMapa() {
             elNarrativa.textContent = `Avançando para ${proximoCenario}... Carregando novo mapa e narrativa...`;
         }
 
-        // Solicita o novo mapa e a nova narrativa
-        const [dadosMapa, novaNarrativa] = await Promise.all([
-            solicitarNovoMapa(proximoCenario),
-            solicitarNovaNarrativa(proximoCenario, numeroProximoMapa)
-        ]);
+        // Dispara narrativa em paralelo, mas atualiza o mapa assim que ele (ou o padrão) responder
+        const promessaNarrativa = solicitarNovaNarrativa(proximoCenario, numeroProximoMapa);
+        const dadosMapa = await solicitarNovoMapa(proximoCenario);
 
-        // Atualiza a tela com o novo mapa e narrativa, preservando as estatísticas da sessão
-        atualizarTelaComNovoMapa(dadosMapa.matriz_mapa, dadosMapa.tipo_cenario, novaNarrativa);
+        gerarMapa(dadosMapa.matriz_mapa, dadosMapa.tipo_cenario);
+        mapaAtualizado = true;
 
+        const novaNarrativa = await promessaNarrativa;
+        if (elNarrativa && novaNarrativa) {
+            elNarrativa.textContent = novaNarrativa;
+        }
+
+        console.log(`Novo mapa carregado: ${dadosMapa.tipo_cenario}`);
     } catch (erro) {
         console.error("Erro durante a troca de mapas:", erro);
+        if (!mapaAtualizado && typeof obterMapaPadrao === "function") {
+            const mapaPadrao = obterMapaPadrao(proximoCenario);
+            atualizarTelaComNovoMapa(mapaPadrao.matriz_mapa, mapaPadrao.tipo_cenario);
+        }
     } finally {
         carregandoMapa = false;
     }
