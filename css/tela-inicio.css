@@ -22,7 +22,7 @@
             rgba(0, 0, 14, 0.45),
             rgba(14, 8, 49, 0.65)
         ),
-        url("../sprites/wallpaper-start.webp") center / cover no-repeat;
+        url("../img/wallpaper-start.gif") center / cover no-repeat;
 
     z-index: -1;
 }
