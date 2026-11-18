@@ -11,13 +11,10 @@ const MONTANHA = "Montanha";
 
 const lista_regiao = [FLORESTA,CIDADE,RUINA,MONTANHA];
 
-<<<<<<< HEAD
 let botaoModalGeminiSim = document.querySelector("#btn-modal-gemini-sim")
 let botaoModalGeminiNao = document.querySelector("#btn-modal-gemini-nao")
-=======
-let botaoContinuarComGemini = document.querySelector("#btn-continuar-com-gemini")
->>>>>>> 518dc99c77827695117ab58c5e355c5f4c1448d5
 let mensagemErroSemChave = document.querySelector("#erro-sem-chave")
+let mensagemSucessoGemini = document.querySelector("#mensagem-sucesso")
 let animacaoGemini = document.querySelector("#animacao-gemini")
 let textoAnimacaoGemini = document.querySelector("#texto-animacao-gemini")
 
@@ -202,15 +199,10 @@ async function chamar_gemini(prompt) {
     }    
 }
 
-<<<<<<< HEAD
 // Gera um mapa com o Gemini (cenario sorteado) e monta a nova tela do mapa.
 // Retorna o resultado completo (tipo_cenario, descricao, matriz_mapa) pra
 // alimentar a narrativa logo em seguida.
-async function gerarMapaGemini() {
-=======
-// Gera um mapa com o Gemini (cenario sorteado) e monta a nova tela do mapa
 async function gerarMapaGemini(cenarioSorteado = cenario_aleatorio(lista_regiao)) {
->>>>>>> 518dc99c77827695117ab58c5e355c5f4c1448d5
     console.log("Resultado do prompt:");
 
     const texto = gerar_prompt_mapa([cenarioSorteado]);
@@ -233,7 +225,6 @@ async function gerarMapaGemini(cenarioSorteado = cenario_aleatorio(lista_regiao)
         cenarioFinal
     );
 
-<<<<<<< HEAD
     return resultado;
 }
 
@@ -309,14 +300,6 @@ botaoModalGeminiNao.addEventListener("click", () => {
     entrarNoJogo();
 });
 
-=======
-    return {
-        tipoCenario: cenarioFinal,
-        descricao: resultado.descricao || ""
-    };
-}
-
->>>>>>> 518dc99c77827695117ab58c5e355c5f4c1448d5
 // ============================================================
 // Pessoa 8 (Breno Oliveira) — Geração e solicitação de mapa
 // ============================================================
@@ -546,66 +529,8 @@ async function gerarNarrativa({ tipoCenario = "Floresta", descricaoMapa = "", fo
 // Gera a narrativa do cenário atual e mostra na tela do jogo.
 // "descricaoMapa" é a descricao que o Gemini devolve junto com o mapa (opcional).
 // "mapasVisitados" não é mais usado: a Narrativa conta as transições sozinha.
-const NARRATIVAS_FALLBACK_LOCAL = {
-    "Floresta": "Você adentra uma parte mais densa da Floresta. Sombras se movem entre as árvores à sua frente.",
-    "Cidade": "Você cruza os portões de uma Cidade silenciosa. Becos escuros escondem perigos à sua espera.",
-    "Ruina": "Você penetra nos corredores de uma Ruína ancestral. Criaturas observam sua chegada na escuridão.",
-    "Montanha": "O vento gélido ruge pelos desfiladeiros da Montanha. A trilha à frente exige cautela."
-};
-
 async function solicitarNovaNarrativa(cenario, mapasVisitados, descricaoMapa = "") {
-<<<<<<< HEAD
     await garantirNarrativa();
     const { texto } = await gerarNarrativa({ tipoCenario: cenario, descricaoMapa });
     return texto;
 }
-=======
-    try {
-        await garantirNarrativa();
-        const { texto } = await gerarNarrativa({ tipoCenario: cenario, descricaoMapa });
-        return texto;
-    } catch (erro) {
-        console.warn("Erro ao solicitar narrativa, usando fallback local.", erro);
-        const textoFallback = NARRATIVAS_FALLBACK_LOCAL[cenario] || NARRATIVAS_FALLBACK_LOCAL[FLORESTA];
-        exibirNarrativa(textoFallback);
-        return textoFallback;
-    }
-}
-
-// ------------------------------------------------------------
-
-// Botão "Continuar com Gemini" do modal do botão jogar: gera mapa e narrativa antes de entrar no jogo
-if (botaoContinuarComGemini) {
-    botaoContinuarComGemini.addEventListener("click", async () => {
-        mensagemErroSemChave.hidden = true;
-
-        if (!temChaveCadastrada()) return;
-
-        botaoContinuarComGemini.disabled = true; // evita cliques repetidos enquanto a API responde
-        exibirAnimacaoGemini("Gerando mapa e narrativa...");
-
-        const cenarioSorteado = cenario_aleatorio(lista_regiao);
-        let cenarioFinal = cenarioSorteado;
-        let descricaoMapa = "";
-
-        try {
-            const dadosMapa = await gerarMapaGemini(cenarioSorteado);
-            cenarioFinal = dadosMapa.tipoCenario;
-            descricaoMapa = dadosMapa.descricao;
-        } catch (erro) {
-            console.warn("Falha ao gerar mapa via Gemini. Carregando mapa padrão.", erro);
-            const mapaPadrao = obterMapaPadrao(cenarioSorteado);
-            gerarMapa(mapaPadrao.matriz_mapa, mapaPadrao.tipo_cenario);
-        }
-
-        try {
-            await solicitarNovaNarrativa(cenarioFinal, 0, descricaoMapa);
-        } finally {
-            botaoContinuarComGemini.disabled = false;
-            esconderAnimacaoGemini();
-        }
-
-        entrarNoJogo();
-    });
-}
->>>>>>> 518dc99c77827695117ab58c5e355c5f4c1448d5
