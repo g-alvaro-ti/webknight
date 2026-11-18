@@ -1,10 +1,17 @@
+
+/* ========================================
+   TELA INICIAL
+======================================== */
+
 #tela-inicial {
     position: relative;
     isolation: isolate;
     overflow: hidden;
+    min-height: 100vh;
+    height: auto;
 }
 
-/* Imagem de fundo com blur */
+/* Plano de fundo */
 #tela-inicial::before {
     content: "";
     position: absolute;
@@ -18,4 +25,496 @@
         url("../sprites/wallpaper-start.webp") center / cover no-repeat;
 
     z-index: -1;
+}
+
+
+/* ========================================
+   BARRA SUPERIOR
+======================================== */
+
+.barra-superior {
+    position: relative;
+    z-index: 10;
+
+    width: 100%;
+    min-height: 100px;
+
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+
+    padding: 12px 30px;
+    gap: 12px;
+}
+
+/* Divisória dourada */
+.divisoria-superior {
+    width: calc(100% - 76px);
+    height: 3px;
+    margin: 0 auto;
+
+    background: linear-gradient(
+        90deg,
+        transparent,
+        #d4a45b 12%,
+        #f4d58d 50%,
+        #d4a45b 88%,
+        transparent
+    );
+
+    box-shadow: 0 1px 7px rgba(244, 213, 141, 0.45);
+}
+
+/* Botões de conta */
+.btn-conta {
+    padding: 14px 24px;
+
+    font-family: 'Silkscreen', monospace;
+    font-size: 13px;
+
+    color: white;
+    background-color: #751e2b;
+
+    border: 3px solid #d4a45b;
+    box-shadow: 0 4px #42101b;
+
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-conta:hover {
+    background-color: #a32d3c;
+    transform: scale(1.05);
+}
+
+.btn-conta:active {
+    transform: translateY(3px);
+    box-shadow: 0 1px #42101b;
+}
+
+.btn-conta[hidden] {
+    display: none;
+}
+
+
+/* ========================================
+   PERSONAGENS E MENU
+======================================== */
+
+.inicio-conteudo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 0;
+    width: 100%;
+
+    min-height: calc(100vh - 110px);
+
+    padding: 25px 2%;
+}
+
+/* Personagens */
+.inicio-personagem {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex: 0 1 31%;
+    min-width: 0;
+}
+
+/* Animação dos sprites */
+.inicio-sprite {
+    --tamanho: clamp(290px, 40vw, 510px);
+
+    width: var(--tamanho);
+    height: var(--tamanho);
+
+    flex-shrink: 0;
+
+    background-repeat: no-repeat;
+    background-size: calc(var(--tamanho) * 6) var(--tamanho);
+
+    image-rendering: pixelated;
+
+    animation: animar-personagem 1s steps(6) infinite;
+}
+
+/* Cavaleiro */
+.cavaleiro-inicio {
+    background-image: url("../sprites/Soldier_Idle.png");
+}
+
+/* Demônio */
+.demonio-inicio {
+    background-image: url("../sprites/Demon_A_Idle.png");
+}
+
+/* Animação dos seis quadros */
+@keyframes animar-personagem {
+    from {
+        background-position: 0 0;
+    }
+
+    to {
+        background-position: calc(var(--tamanho) * -6) 0;
+    }
+}
+
+
+/* ========================================
+   MENU CENTRAL
+======================================== */
+
+.inicio-menu {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    gap: 30px;
+
+    flex: 0 0 38%;
+    min-width: 280px;
+
+    text-align: center;
+    color: white;
+    text-shadow: 3px 3px #000;
+}
+
+.inicio-menu h1 {
+    font-size: clamp(40px, 5vw, 68px);
+    color: #f4d58d;
+}
+
+.inicio-menu p {
+    font-size: 18px;
+    line-height: 1.9;
+}
+
+/* Botão iniciar */
+#btn-iniciar {
+    padding: 23px 36px;
+
+    font-family: 'Silkscreen', monospace;
+    font-size: 19px;
+
+    color: white;
+    background-color: #751e2b;
+
+    border: 4px solid #d4a45b;
+    box-shadow: 0 5px #42101b;
+
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+#btn-iniciar:hover {
+    background-color: #a32d3c;
+    transform: scale(1.08);
+}
+
+#btn-iniciar:active {
+    transform: translateY(4px);
+    box-shadow: 0 1px #42101b;
+}
+
+
+/* ========================================
+   MODAIS
+======================================== */
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+
+    background-color: rgba(0, 0, 0, 0.75);
+}
+
+/* Respeita o atributo hidden */
+.modal-overlay[hidden] {
+    display: none;
+}
+
+.modal-conteudo {
+    position: relative;
+
+    width: 100%;
+    max-width: 460px;
+
+    padding: 40px 35px;
+
+    background-color: #211b2b;
+
+    border: 4px solid #d4a45b;
+    box-shadow: 8px 8px 0 #000;
+
+    color: white;
+
+    animation: aparecer-modal 0.25s ease;
+}
+
+.modal-conteudo h2 {
+    margin-bottom: 28px;
+
+    text-align: center;
+    font-size: 21px;
+
+    color: #f4d58d;
+    text-shadow: 3px 3px #000;
+}
+
+.modal-conteudo p {
+    margin-bottom: 25px;
+
+    text-align: center;
+    font-size: 13px;
+    line-height: 1.8;
+}
+
+/* Botão de fechar */
+.btn-fechar {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+
+    padding: 6px 10px;
+
+    font-family: 'Silkscreen', monospace;
+    font-size: 13px;
+
+    color: white;
+    background-color: #751e2b;
+
+    border: 2px solid #d4a45b;
+
+    cursor: pointer;
+}
+
+.btn-fechar:hover {
+    background-color: #a32d3c;
+}
+
+/* Campos do formulário */
+.campo-modal {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+
+    margin-bottom: 20px;
+}
+
+.campo-modal label {
+    font-size: 13px;
+    color: #f4d58d;
+}
+
+.campo-modal input {
+    width: 100%;
+    padding: 14px;
+
+    font-family: Arial, sans-serif;
+    font-size: 15px;
+
+    color: #222;
+    background-color: #f1eee7;
+
+    border: 3px solid #a17b43;
+    outline: none;
+}
+
+.campo-modal input:focus {
+    border-color: #f4d58d;
+}
+
+/* Botões dos modais */
+.btn-modal {
+    width: 100%;
+    padding: 16px;
+
+    font-family: 'Silkscreen', monospace;
+    font-size: 12px;
+
+    color: white;
+    background-color: #751e2b;
+
+    border: 3px solid #d4a45b;
+    box-shadow: 0 4px #42101b;
+
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-modal:hover {
+    background-color: #a32d3c;
+}
+
+.btn-modal:active {
+    transform: translateY(3px);
+    box-shadow: 0 1px #42101b;
+}
+
+/* Organização dos botões de logout */
+.botoes-modal {
+    display: flex;
+    gap: 12px;
+}
+
+.btn-secundario {
+    color: #f4d58d;
+    background-color: #393143;
+}
+
+.btn-secundario:hover {
+    background-color: #51445e;
+}
+
+/* Animação dos modais */
+@keyframes aparecer-modal {
+    from {
+        opacity: 0;
+        transform: translateY(-15px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+/* ========================================
+   RESPONSIVIDADE - TABLETS
+======================================== */
+
+@media (max-width: 800px) {
+
+    .inicio-conteudo {
+        gap: 0;
+        padding: 20px 1%;
+    }
+
+    .inicio-personagem {
+        flex-basis: 29%;
+    }
+
+    .inicio-sprite {
+        --tamanho: clamp(155px, 29vw, 270px);
+    }
+
+    .inicio-menu {
+        flex-basis: 42%;
+        min-width: 0;
+        gap: 22px;
+    }
+
+    .inicio-menu h1 {
+        font-size: clamp(22px, 4vw, 36px);
+    }
+
+    .inicio-menu p {
+        font-size: 12px;
+    }
+
+    #btn-iniciar {
+        padding: 16px 19px;
+        font-size: 13px;
+    }
+}
+
+
+/* ========================================
+   RESPONSIVIDADE - CELULARES
+======================================== */
+
+@media (max-width: 520px) {
+
+    .barra-superior {
+        min-height: 55px;
+        padding: 10px 12px;
+    }
+
+    .btn-conta {
+        padding: 10px 14px;
+        font-size: 10px;
+    }
+
+    .divisoria-superior {
+        width: calc(100% - 30px);
+    }
+
+    .inicio-conteudo {
+        min-height: calc(100vh - 58px);
+
+        flex-wrap: wrap;
+        align-content: center;
+
+        row-gap: 0;
+        padding: 15px 1%;
+    }
+
+    .inicio-personagem {
+        flex: 0 0 32%;
+    }
+
+    .inicio-sprite {
+        --tamanho: clamp(115px, 29vw, 155px);
+    }
+
+    .inicio-menu {
+        order: 3;
+
+        flex: 0 0 100%;
+        min-width: 0;
+
+        gap: 16px;
+        margin-top: -8px;
+    }
+
+    .inicio-menu h1 {
+        font-size: 28px;
+    }
+
+    .inicio-menu p {
+        font-size: 11px;
+    }
+
+    #btn-iniciar {
+        padding: 14px 18px;
+        font-size: 11px;
+    }
+
+    /* Modais */
+    .modal-conteudo {
+        padding: 38px 20px 25px;
+    }
+
+    .modal-conteudo h2 {
+        font-size: 16px;
+    }
+
+    .modal-conteudo p {
+        font-size: 11px;
+    }
+
+    .campo-modal label {
+        font-size: 11px;
+    }
+
+    .btn-modal {
+        font-size: 9px;
+        padding: 13px 8px;
+    }
+
+    .btn-fechar {
+        font-size: 11px;
+    }
 }

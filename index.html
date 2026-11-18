@@ -17,7 +17,71 @@
 <body>
     <!-- Tela inicial, contendo o cadastro do email do jogador-->
     <section id="tela-inicial">
+        <!-- Barra superior -->
+        <div class="barra-superior">
+            <button id="btn-login" class="btn-conta">LOGIN</button>
+            <button id="btn-logout" class="btn-conta" hidden>LOGOUT</button>
+        </div>
 
+        <div class="divisoria-superior"></div>
+
+        <div class="inicio-conteudo">
+            <!-- Personagem principal -->
+            <div class="inicio-personagem">
+                <div class="inicio-sprite cavaleiro-inicio"></div>
+            </div>
+
+            <!-- Botão central -->
+            <div class="inicio-menu">
+                <h1>WEBKNIGHT</h1>
+                <p>Uma aventura está prestes a começar...</p>
+                <button id="btn-iniciar">JOGAR!</button>
+            </div>
+
+            <!-- Vilão -->
+            <div class="inicio-personagem">
+                <div class="inicio-sprite demonio-inicio"></div>
+            </div>
+
+        </div>
+
+        <!-- Modal de login -->
+        <div id="modal-login" class="modal-overlay" hidden>
+            <div class="modal-conteudo">
+                <button class="btn-fechar" data-fechar="modal-login">X</button>
+                <h2>LOGIN</h2>
+                <form id="form-login">
+                    <div class="campo-modal">
+                        <label for="login-email">E-mail</label>
+                        <input type="email" id="login-email" placeholder="Digite seu e-mail" required>
+                    </div>
+
+                    <div class="campo-modal">
+                        <label for="login-nome">Nome</label>
+                        <input type="text" id="login-nome" placeholder="Digite seu nome" required>
+                    </div>
+
+                    <div class="campo-modal">
+                        <label for="login-senha">Senha</label>
+                        <input type="password" id="login-senha" placeholder="Digite sua senha" required>
+                    </div>
+                    <button type="submit" class="btn-modal">ENTRAR</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Modal de logout -->
+        <div id="modal-logout" class="modal-overlay" hidden>
+            <div class="modal-conteudo">
+                <button class="btn-fechar" data-fechar="modal-logout">X</button>
+                <h2>SAIR DO JOGO?</h2>
+                <p>Tem certeza de que deseja sair da sua conta?</p>
+                <div class="botoes-modal">
+                    <button id="btn-cancelar-logout" class="btn-modal btn-secundario">CANCELAR</button>
+                    <button id="btn-confirmar-logout" class="btn-modal">SAIR</button>
+                </div>
+            </div>
+        </div>
     </section>
 
     <!-- Tela com o mapa do jogo, jogador e inimigos -->
