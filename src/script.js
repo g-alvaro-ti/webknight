@@ -23,6 +23,17 @@ function exibirTelaFinal(estado){
     telaFinal.classList.toggle("hidden", estado)
 }
 
+function entrarNoJogo(){
+    const modalJogar = document.querySelector("#modal-jogar");
+    if (modalJogar) modalJogar.hidden = true;
+
+    // Esconde a tela inicial
+    exibirTelaInicial(true);
+
+    // Mostra a tela do jogo
+    exibirJogo(false);
+}
+
 // Inicialização das telas
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -34,10 +45,12 @@ document.addEventListener("DOMContentLoaded", () => {
     // Evento do botão iniciar
     const botaoIniciar = document.querySelector("#btn-iniciar");
     const modalJogar = document.querySelector("#modal-jogar");
-    const botaoContinuar = document.querySelector("#btn-continuar");
+    const botaoContinuarSemGemini = document.querySelector("#btn-continuar-sem-gemini");
 
     if (botaoIniciar) {
         botaoIniciar.addEventListener("click", () => {
+            const erroSemChave = document.querySelector("#erro-sem-chave");
+            if (erroSemChave) erroSemChave.hidden = true;
 
             // Mostra o modal com as opções antes de entrar no jogo
             modalJogar.hidden = false;
@@ -45,17 +58,11 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Continuar fecha o modal e entra na tela do jogo
-    if (botaoContinuar) {
-        botaoContinuar.addEventListener("click", () => {
+    // Continuar sem Gemini fecha o modal e entra na tela do jogo
+    if (botaoContinuarSemGemini) {
+        botaoContinuarSemGemini.addEventListener("click", () => {
 
-            modalJogar.hidden = true;
-
-            // Esconde a tela inicial
-            exibirTelaInicial(true);
-
-            // Mostra a tela do jogo
-            exibirJogo(false);
+            entrarNoJogo();
 
         });
     }

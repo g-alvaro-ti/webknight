@@ -11,10 +11,8 @@ const MONTANHA = "Montanha";
 
 const lista_regiao = [FLORESTA,CIDADE,RUINA,MONTANHA];
 
-let botaoModalGerarMapa = document.querySelector("#btn-modal-gerar-mapa")
-let botaoModalGerarNarrativa = document.querySelector("#btn-modal-gerar-narrativa")
+let botaoContinuarComGemini = document.querySelector("#btn-continuar-com-gemini")
 let mensagemErroSemChave = document.querySelector("#erro-sem-chave")
-let mensagemSucessoGemini = document.querySelector("#mensagem-sucesso")
 let animacaoGemini = document.querySelector("#animacao-gemini")
 let textoAnimacaoGemini = document.querySelector("#texto-animacao-gemini")
 
@@ -219,35 +217,12 @@ async function gerarMapaGemini(cenarioSorteado = cenario_aleatorio(lista_regiao)
         resultado.matriz_mapa,
         cenarioFinal
     );
+
+    return {
+        tipoCenario: cenarioFinal,
+        descricao: resultado.descricao || ""
+    };
 }
-
-// Botão de gerar mapa do modal do botão jogar
-botaoModalGerarMapa.addEventListener("click", async function() {
-    mensagemErroSemChave.hidden = true;
-    mensagemSucessoGemini.hidden = true;
-
-    if (!temChaveCadastrada()) return;
-
-    botaoModalGerarMapa.disabled = true; // evita cliques repetidos enquanto a API responde
-    exibirAnimacaoGemini("Gerando mapa...");
-    const cenarioSorteado = cenario_aleatorio(lista_regiao);
-
-    try {
-        await gerarMapaGemini(cenarioSorteado);
-        mensagemSucessoGemini.textContent = "Mapa gerado com sucesso!";
-        mensagemSucessoGemini.hidden = false;
-    } catch (erro) {
-        console.warn("Falha ao gerar mapa via Gemini. Carregando mapa padrão.", erro);
-        const matrizPadrao = MAPAS_PADRAO[cenarioSorteado] || MAPAS_PADRAO["Floresta"];
-        gerarMapa(
-            matrizPadrao.map(linha => [...linha]),
-            cenarioSorteado
-        );
-    } finally {
-        botaoModalGerarMapa.disabled = false;
-        esconderAnimacaoGemini();
-    }
-});
 
 // ============================================================
 // Pessoa 8 (Breno Oliveira) — Geração e solicitação de mapa
@@ -467,38 +442,40 @@ async function solicitarNovaNarrativa(cenario, mapasVisitados, descricaoMapa = "
 
 // ------------------------------------------------------------
 
-// Gera a narrativa do cenário atual e mostra na tela do jogo.
-// Usada pelo botão "Gerar Narrativa" do modal do botão jogar.
-async function gerarNarrativaGemini() {
-    // Usa a região do mapa que está na tela (guardada pelo painel-jogador.js).
-    // Se não existir, sorteia uma.
-    const regiao = (typeof dadosLocalizacao !== "undefined" && dadosLocalizacao.regiao)
-        ? dadosLocalizacao.regiao
-        : cenario_aleatorio(lista_regiao);
+// Botão "Continuar com Gemini" do modal do botão jogar: gera mapa e narrativa antes de entrar no jogo
+if (botaoContinuarComGemini) {
+    botaoContinuarComGemini.addEventListener("click", async () => {
+        mensagemErroSemChave.hidden = true;
 
-    const texto = await solicitarNovaNarrativa(regiao, 0, "Cenário de teste, sem mapa associado.");
-    console.log("Narrativa gerada:", texto);
-    return texto;
+        if (!temChaveCadastrada()) return;
+
+        botaoContinuarComGemini.disabled = true; // evita cliques repetidos enquanto a API responde
+        exibirAnimacaoGemini("Gerando mapa e narrativa...");
+
+        const cenarioSorteado = cenario_aleatorio(lista_regiao);
+        let cenarioFinal = cenarioSorteado;
+        let descricaoMapa = "";
+
+        try {
+            const dadosMapa = await gerarMapaGemini(cenarioSorteado);
+            cenarioFinal = dadosMapa.tipoCenario;
+            descricaoMapa = dadosMapa.descricao;
+        } catch (erro) {
+            console.warn("Falha ao gerar mapa via Gemini. Carregando mapa padrão.", erro);
+            const matrizPadrao = MAPAS_PADRAO[cenarioSorteado] || MAPAS_PADRAO["Floresta"];
+            gerarMapa(
+                matrizPadrao.map(linha => [...linha]),
+                cenarioSorteado
+            );
+        }
+
+        try {
+            await solicitarNovaNarrativa(cenarioFinal, 0, descricaoMapa);
+        } finally {
+            botaoContinuarComGemini.disabled = false;
+            esconderAnimacaoGemini();
+        }
+
+        entrarNoJogo();
+    });
 }
-
-// Botão de gerar narrativa do modal do botão jogar
-botaoModalGerarNarrativa.addEventListener("click", async () => {
-    mensagemErroSemChave.hidden = true;
-    mensagemSucessoGemini.hidden = true;
-
-    if (!temChaveCadastrada()) return;
-
-    botaoModalGerarNarrativa.disabled = true; // evita cliques repetidos enquanto a API responde
-    exibirAnimacaoGemini("Escrevendo narrativa...");
-
-    try {
-        await gerarNarrativaGemini();
-        mensagemSucessoGemini.textContent = "Narrativa gerada com sucesso!";
-        mensagemSucessoGemini.hidden = false;
-    } catch (erro) {
-        console.error("Erro ao gerar narrativa:", erro);
-    } finally {
-        botaoModalGerarNarrativa.disabled = false;
-        esconderAnimacaoGemini();
-    }
-});
