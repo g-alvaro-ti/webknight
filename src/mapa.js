@@ -31,7 +31,7 @@ const TEXTURE_2 = "assets/sprites/texture2.png"
 
 const CORES_REGIOES = {
     "Floresta": {
-        0: "#477A3C", // Piso
+        0: "#558c3b", // Piso
         1: "#D9C65B", // Saída
         2: "#344D2D", // Parede
         3: "#477A3C", // Inimigo (piso)
@@ -108,7 +108,7 @@ function moverSpriteComRastro(sprite, celulaOrigem, celulaDestino, dx = 0, dy = 
     fantasma.style.setProperty("--move-dy", dy);
 
     fantasma.addEventListener("animationend", () => fantasma.remove(), { once: true });
-    setTimeout(() => { if (fantasma.isConnected) fantasma.remove(); }, 350);
+    setTimeout(() => { if (fantasma.isConnected) fantasma.remove(); }, 500);
 
     celulaOrigem.removeChild(sprite);
     celulaOrigem.appendChild(fantasma);
