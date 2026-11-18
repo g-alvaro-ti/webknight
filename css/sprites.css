@@ -99,3 +99,33 @@
 .cavaleiro-walk-cima { --sprite-linha: 1; } /* Linha 2 */
 .cavaleiro-walk-esquerda  { --sprite-linha: 2; } /* Linha 3 */
 .cavaleiro-walk-direita     { --sprite-linha: 3; } /* Linha 4 */
+
+/* Deslize suave do sprite ao entrar na nova célula sem interromper animar-sprite */
+.sprite-animado.sprite-passo-transicao {
+    transition: transform 0.13s ease-out;
+}
+
+/* Rastro fantasma translúcido deixado na célula de origem */
+.rastro-fantasma {
+    background-position: 0 calc(-1 * var(--sprite-linha, 0) * var(--cell-size) * var(--escala-sprite));
+    pointer-events: none;
+    animation: rastro-fantasma 0.3s ease-out forwards;
+}
+
+@keyframes rastro-fantasma {
+    0% {
+        opacity: 0.6;
+        filter: brightness(1.35) saturate(0.5);
+        transform: translate(0, 0) scale(1);
+    }
+    100% {
+        opacity: 0;
+        filter: brightness(1.6) saturate(0.2);
+        transform:
+            translate(
+                calc(var(--move-dx, 0) * var(--cell-size) * 0.2),
+                calc(var(--move-dy, 0) * var(--cell-size) * 0.2)
+            )
+            scale(0.88);
+    }
+}

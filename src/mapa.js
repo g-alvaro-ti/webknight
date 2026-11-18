@@ -90,6 +90,30 @@ function adicionarSpriteAnimado(celula, classeSprite, ordemZ = 1) {
     return sprite;
 }
 
+// Move o sprite entre células deixando um fantasma translúcido na célula de origem
+function moverSpriteComRastro(sprite, celulaOrigem, celulaDestino, dx = 0, dy = 0) {
+    const fantasma = sprite.cloneNode(false);
+    fantasma.classList.remove("sprite-passo-transicao");
+    fantasma.classList.add("rastro-fantasma");
+    fantasma.style.transform = "";
+    fantasma.style.zIndex = 1;
+    fantasma.style.setProperty("--move-dx", dx);
+    fantasma.style.setProperty("--move-dy", dy);
+
+    fantasma.addEventListener("animationend", () => fantasma.remove(), { once: true });
+    setTimeout(() => { if (fantasma.isConnected) fantasma.remove(); }, 350);
+
+    celulaOrigem.removeChild(sprite);
+    celulaOrigem.appendChild(fantasma);
+    celulaDestino.appendChild(sprite);
+
+    sprite.classList.remove("sprite-passo-transicao");
+    sprite.style.transform = `translate(calc(${-dx} * var(--cell-size) * 0.3), calc(${-dy} * var(--cell-size) * 0.3))`;
+    void sprite.offsetWidth;
+    sprite.classList.add("sprite-passo-transicao");
+    sprite.style.transform = "translate(0, 0)";
+}
+
 const mapa = [];
 function gerarMapaVazio(){
 for (let i = 0; i < LINHAS; i++) {
@@ -251,8 +275,7 @@ function moverJogador(dx, dy) {
     if (dx > 0) direcaoAtual = "direita";
 
     const celulaAtual = mapa[jogadorPosicao.linha][jogadorPosicao.coluna];
-    celulaAtual.removeChild(jogadorElemento);
-    celulaDestino.appendChild(jogadorElemento);
+    moverSpriteComRastro(jogadorElemento, celulaAtual, celulaDestino, dx, dy);
 
     jogadorPosicao = { linha: novaLinha, coluna: novaColuna };
 
@@ -302,10 +325,10 @@ function podeMoverInimigo(linha, coluna) {
     if (coluna < 0 || coluna >= COLUNAS) return false;
 
     const tipoCelula = mapa[linha][coluna].dataset.tipo;
-    if (tipoCelula === "parede" || tipoCelula === "inimigo") return false;
+    if (tipoCelula === "parede" || tipoCelula === "inimigo" || tipoCelula === "saida") return false;
 
-    // Não deixa o inimigo pisar em cima do jogador
-    if (linha === jogadorPosicao.linha && coluna === jogadorPosicao.coluna) return false;
+    // O inimigo pode pisar na célula do jogador
+    if (linha === jogadorPosicao.linha && coluna === jogadorPosicao.coluna) return true;
 
     return true;
 }
@@ -317,14 +340,43 @@ function moverInimigos() {
         // Chance de permanecer parado neste turno
         if (Math.random() < CHANCE_INIMIGO_PARADO) continue;
 
-        // Mantém só as direções que não levam a paredes ou fora dos limites
-        const direcoesValidas = DIRECOES_INIMIGO.filter(({ dx, dy }) =>
-            podeMoverInimigo(inimigo.linha + dy, inimigo.coluna + dx)
+        // Calcula a distância entre o inimigo e o jogador
+        const diferencaLinha = jogadorPosicao.linha - inimigo.linha;
+        const diferencaColuna = jogadorPosicao.coluna - inimigo.coluna;
+
+        // Descobre quais direções aproximam o inimigo do jogador
+        const direcoesValidas = [];
+
+        if (diferencaLinha < 0) {
+            direcoesValidas.push({ dx: 0, dy: -1 });
+        }
+
+        if (diferencaLinha > 0) {
+            direcoesValidas.push({ dx: 0, dy: 1 });
+        }
+
+        if (diferencaColuna < 0) {
+            direcoesValidas.push({ dx: -1, dy: 0 });
+        }
+
+        if (diferencaColuna > 0) {
+            direcoesValidas.push({ dx: 1, dy: 0 });
+        }
+
+        // Remove direções que levam a paredes ou outros inimigos
+        const movimentosPossiveis = direcoesValidas.filter(({ dx, dy }) =>
+            podeMoverInimigo(
+                inimigo.linha + dy,
+                inimigo.coluna + dx
+            )
         );
 
-        if (direcoesValidas.length === 0) continue;
+        if (movimentosPossiveis.length === 0) continue;
 
-        const { dx, dy } = direcoesValidas[Math.floor(Math.random() * direcoesValidas.length)];
+        // Escolhe aleatoriamente uma das direções possíveis
+        const { dx, dy } = movimentosPossiveis[
+            Math.floor(Math.random() * movimentosPossiveis.length)
+        ];
 
         const novaLinha  = inimigo.linha  + dy;
         const novaColuna = inimigo.coluna + dx;
@@ -332,8 +384,7 @@ function moverInimigos() {
         const celulaAtual   = mapa[inimigo.linha][inimigo.coluna];
         const celulaDestino = mapa[novaLinha][novaColuna];
 
-        celulaAtual.removeChild(inimigo.elemento);
-        celulaDestino.appendChild(inimigo.elemento);
+        moverSpriteComRastro(inimigo.elemento, celulaAtual, celulaDestino, dx, dy);
 
         // A célula que o inimigo saiu volta a ser piso e o destino passa a ser inimigo
         celulaAtual.dataset.tipo   = "piso";
@@ -342,6 +393,12 @@ function moverInimigos() {
         // Atualiza o estado do inimigo pra próxima movimentação
         inimigo.linha  = novaLinha;
         inimigo.coluna = novaColuna;
+
+        // Verifica se o inimigo encontrou o jogador, e inicia uma batalha
+        if (novaLinha === jogadorPosicao.linha && novaColuna === jogadorPosicao.coluna) {
+            detectarEncontroInimigo(novaLinha, novaColuna, mapa[novaLinha][novaColuna]);
+            continue;
+        }
     }
 }
 
