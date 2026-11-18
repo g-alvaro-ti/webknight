@@ -33,9 +33,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Evento do botão iniciar
     const botaoIniciar = document.querySelector("#btn-iniciar");
+    const modalJogar = document.querySelector("#modal-jogar");
+    const botaoContinuar = document.querySelector("#btn-continuar");
 
     if (botaoIniciar) {
         botaoIniciar.addEventListener("click", () => {
+
+            // Mostra o modal com as opções antes de entrar no jogo
+            modalJogar.hidden = false;
+
+        });
+    }
+
+    // Continuar fecha o modal e entra na tela do jogo
+    if (botaoContinuar) {
+        botaoContinuar.addEventListener("click", () => {
+
+            modalJogar.hidden = true;
 
             // Esconde a tela inicial
             exibirTelaInicial(true);
@@ -110,8 +124,9 @@ document.addEventListener("DOMContentLoaded", () => {
     document.addEventListener("keydown", (evento) => {
 
         if (evento.key === "Escape") {
-            modalLogin.hidden = true;
-            modalLogout.hidden = true;
+            document.querySelectorAll(".modal-overlay").forEach(modal => {
+                modal.hidden = true;
+            });
         }
 
     });

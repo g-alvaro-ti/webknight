@@ -1,11 +1,11 @@
-#tela-fim {
+#tela-batalha {
     position: relative;
     isolation: isolate;
     overflow: hidden;
 }
 
 /* Imagem de fundo com blur */
-#tela-fim::before {
+#tela-batalha::before {
     content: "";
     position: absolute;
     inset: -10px;
@@ -15,7 +15,7 @@
             rgba(0, 0, 14, 0.45),
             rgba(14, 8, 49, 0.65)
         ),
-        url("../img/river.gif") center / cover no-repeat;
+        url("../dungeon.gif") center / cover no-repeat;
 
     z-index: -1;
 }

@@ -23,11 +23,11 @@ const DIRECOES_INIMIGO = [
     { dx:  1, dy:  0 }  // Direita
 ];
 
-const SPRITE_PLAYER = "sprites/Soldier_Idle1.png"
-const SPRITE_DEMON = "sprites/Demon_A_Idle1.png"
-const OBJECT_TREE = "sprites/object-tree.png"
-const TEXTURE_1 = "sprites/texture.png"
-const TEXTURE_2 = "sprites/texture2.png"
+const SPRITE_PLAYER = "assets/sprites/Soldier_Idle1.png"
+const SPRITE_DEMON = "assets/sprites/Demon_A_Idle1.png"
+const OBJECT_TREE = "assets/sprites/object-tree.png"
+const TEXTURE_1 = "assets/sprites/texture.png"
+const TEXTURE_2 = "assets/sprites/texture2.png"
 
 const CORES_REGIOES = {
     "Floresta": {

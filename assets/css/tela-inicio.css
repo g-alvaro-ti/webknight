@@ -1,0 +1,837 @@
+
+/* ========================================
+   TELA INICIAL
+======================================== */
+
+#tela-inicial {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    min-height: 100vh;
+    height: auto;
+
+    /* Organiza a seção em coluna: barra e divisória no topo,
+       conteúdo principal centrado no espaço restante */
+    display: flex;
+    flex-direction: column;
+}
+
+/* Plano de fundo */
+#tela-inicial::before {
+    content: "";
+    position: absolute;
+    inset: -10px;
+
+    background:
+        linear-gradient(
+            rgba(0, 0, 14, 0.45),
+            rgba(14, 8, 49, 0.65)
+        ),
+        url("../wallpaper-start.gif") center / cover no-repeat;
+
+    z-index: -1;
+}
+
+
+/* ========================================
+   BARRA SUPERIOR
+======================================== */
+
+.barra-superior {
+    position: relative;
+    z-index: 10;
+
+    width: 100%;
+    min-height: 72px;
+
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+
+    padding: 10px 30px;
+    gap: 12px;
+}
+
+/* Divisória dourada do topo */
+.divisoria-superior {
+    width: calc(100% - 76px);
+    height: 3px;
+    margin: 0 auto;
+
+    background: linear-gradient(
+        90deg,
+        transparent,
+        #d4a45b 12%,
+        #f4d58d 50%,
+        #d4a45b 88%,
+        transparent
+    );
+
+    box-shadow: 0 1px 7px rgba(244, 213, 141, 0.45);
+}
+
+/* Botões de conta */
+.btn-conta {
+    padding: 14px 24px;
+
+    font-family: 'Silkscreen', monospace;
+    font-size: 13px;
+
+    color: white;
+    background-color: #751e2b;
+
+    border: 3px solid #d4a45b;
+    box-shadow: 0 4px #42101b;
+
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-conta:hover {
+    background-color: #a32d3c;
+    transform: scale(1.05);
+}
+
+.btn-conta:active {
+    transform: translateY(3px);
+    box-shadow: 0 1px #42101b;
+}
+
+.btn-conta[hidden] {
+    display: none;
+}
+
+
+/* ========================================
+   PERSEGUIÇÃO NA BORDA E MENU
+======================================== */
+
+.inicio-conteudo {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+
+    /* Ocupa o espaço restante da seção e encosta o menu
+       logo abaixo da linha divisória */
+    flex: 1;
+    min-height: 0;
+
+    width: 100%;
+
+    padding: 30px 2%;
+}
+
+/* Fugindo na parte de baixo da tela: âncora na borda inferior da seção.
+   Sem altura nem overflow: os sprites ultrapassam o topo do contêiner
+   e o transbordo horizontal é cortado pela própria #tela-inicial. */
+.inicio-corrida {
+    position: absolute;
+    inset: auto 0 0 0;
+
+    z-index: 5;
+    pointer-events: none;
+}
+
+/* Base dos personagens da perseguição */
+.corredor {
+    position: absolute;
+    left: 0;
+
+    --tamanho-corredor: clamp(180px, 23vw, 330px);
+
+    /* Os quadros têm o personagem entre 38% e 60% da altura:
+       41% do quadro é vazio abaixo dos pés. Afundar o quadro
+       nesses 41% encosta os pés na borda inferior da tela. */
+    bottom: calc(var(--tamanho-corredor) * -0.41);
+
+    width: var(--tamanho-corredor);
+    height: var(--tamanho-corredor);
+
+    background-repeat: no-repeat;
+    background-size: calc(var(--tamanho-corredor) * 6) calc(var(--tamanho-corredor) * 4);
+
+    image-rendering: pixelated;
+}
+
+/* Cavaleiro correndo pra direita (linha 4 do spritesheet) */
+.corredor-cavaleiro {
+    background-image: url("../sprites/Soldier_Walk.png");
+    animation:
+        animar-corredor 0.5s steps(6) infinite,
+        fugir-pela-tela 9s linear infinite;
+
+    background-position-y: calc(var(--tamanho-corredor) * -3);
+}
+
+/* Monstro atrás, com sua folha de quadros parado */
+.corredor-monstro {
+    --tamanho-corredor: clamp(195px, 24vw, 350px);
+
+    left: -34vw;
+    bottom: calc(var(--tamanho-corredor) * -0.42); /* pés do demônio a 58% do quadro */
+
+    background-image: url("../sprites/Demon_A_Idle.png");
+    background-size: calc(var(--tamanho-corredor) * 6) var(--tamanho-corredor);
+    background-position-y: 0;
+
+    animation:
+        animar-corredor 0.9s steps(6) infinite,
+        fugir-pela-tela 9s linear infinite;
+}
+
+/* Balão de socorro junto à cabeça do cavaleiro,
+   que começa a 38% da altura do quadro */
+.balao-help {
+    position: absolute;
+    top: calc(var(--tamanho-corredor) * 0.38);
+    left: 50%;
+
+    padding: 5px 9px;
+
+    font-family: 'Silkscreen', monospace;
+    font-size: 14px;
+
+    color: #211b2b;
+    background-color: #f4d58d;
+
+    border: 2px solid #d4a45b;
+    border-radius: 8px;
+
+    white-space: nowrap;
+
+    animation: tremer-balao 0.6s ease-in-out infinite alternate;
+}
+
+/* Biquinho do balão apontando pro cavaleiro */
+.balao-help::after {
+    content: "";
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+
+    border: 5px solid transparent;
+    border-top: 10px solid #d4a45b;
+}
+
+/* Corrida dos quadros do sprite */
+@keyframes animar-corredor {
+    from {
+        background-position-x: 0;
+    }
+
+    to {
+        background-position-x: calc(var(--tamanho-corredor) * -6);
+    }
+}
+
+/* Travessia da tela: o monstro fica sempre atrás, pois começa mais deslocado */
+@keyframes fugir-pela-tela {
+    from {
+        transform: translateX(-25vw);
+    }
+
+    to {
+        transform: translateX(120vw);
+    }
+}
+
+@keyframes tremer-balao {
+    from {
+        transform: translate(-50%, -102%) rotate(-2deg);
+    }
+
+    to {
+        transform: translate(-50%, -112%) rotate(3deg);
+    }
+}
+
+
+/* ========================================
+   MENU CENTRAL
+======================================== */
+
+.inicio-menu {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    gap: 26px;
+
+    flex: 0 0 38%;
+    min-width: 280px;
+
+    text-align: center;
+    color: white;
+    text-shadow: 3px 3px #000;
+}
+
+/* Encurta a distância entre o título e a descrição */
+.inicio-menu h1 {
+    margin-bottom: -10px;
+}
+
+.inicio-menu h1 {
+    font-size: clamp(40px, 5vw, 68px);
+    color: #f4d58d;
+}
+
+.inicio-menu p {
+    font-size: 18px;
+    line-height: 1.9;
+}
+
+/* Botões principais do menu (jogar e configurações) */
+.btn-menu-principal {
+    padding: 13px 24px;
+
+    font-family: 'Silkscreen', monospace;
+    font-size: 13px;
+
+    color: white;
+    background-color: #751e2b;
+
+    border: 3px solid #d4a45b;
+    box-shadow: 0 4px #42101b;
+
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-menu-principal:hover {
+    background-color: #a32d3c;
+    transform: scale(1.06);
+}
+
+.btn-menu-principal:active {
+    transform: translateY(3px);
+    box-shadow: 0 1px #42101b;
+}
+
+
+/* ========================================
+   MODAIS
+======================================== */
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+
+    background-color: rgba(0, 0, 0, 0.75);
+}
+
+/* Respeita o atributo hidden */
+.modal-overlay[hidden] {
+    display: none;
+}
+
+.modal-conteudo {
+    position: relative;
+
+    width: 100%;
+    max-width: 460px;
+
+    padding: 40px 35px;
+
+    background-color: #211b2b;
+
+    border: 4px solid #d4a45b;
+    box-shadow: 8px 8px 0 #000;
+
+    color: white;
+
+    animation: aparecer-modal 0.25s ease;
+}
+
+.modal-conteudo h2 {
+    margin-bottom: 28px;
+
+    text-align: center;
+    font-size: 21px;
+
+    color: #f4d58d;
+    text-shadow: 3px 3px #000;
+}
+
+.modal-conteudo p {
+    margin-bottom: 25px;
+
+    text-align: center;
+    font-size: 13px;
+    line-height: 1.8;
+}
+
+/* Botão de fechar */
+.btn-fechar {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+
+    padding: 6px 10px;
+
+    font-family: 'Silkscreen', monospace;
+    font-size: 13px;
+
+    color: white;
+    background-color: #751e2b;
+
+    border: 2px solid #d4a45b;
+
+    cursor: pointer;
+}
+
+.btn-fechar:hover {
+    background-color: #a32d3c;
+}
+
+/* Campos do formulário */
+.campo-modal {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+
+    margin-bottom: 20px;
+}
+
+.campo-modal label {
+    font-size: 13px;
+    color: #f4d58d;
+}
+
+.campo-modal input {
+    width: 100%;
+    padding: 14px;
+
+    font-family: Arial, sans-serif;
+    font-size: 15px;
+
+    color: #222;
+    background-color: #f1eee7;
+
+    border: 3px solid #a17b43;
+    outline: none;
+}
+
+.campo-modal input:focus {
+    border-color: #f4d58d;
+}
+
+/* Botões dos modais */
+.btn-modal {
+    width: 100%;
+    padding: 16px;
+
+    font-family: 'Silkscreen', monospace;
+    font-size: 12px;
+
+    color: white;
+    background-color: #751e2b;
+
+    border: 3px solid #d4a45b;
+    box-shadow: 0 4px #42101b;
+
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-modal:hover {
+    background-color: #a32d3c;
+}
+
+.btn-modal:active {
+    transform: translateY(3px);
+    box-shadow: 0 1px #42101b;
+}
+
+/* Organização dos botões de logout */
+.botoes-modal {
+    display: flex;
+    gap: 12px;
+}
+
+.btn-secundario {
+    color: #f4d58d;
+    background-color: #393143;
+}
+
+.btn-secundario:hover {
+    background-color: #51445e;
+}
+
+/* Animação dos modais */
+@keyframes aparecer-modal {
+    from {
+        opacity: 0;
+        transform: translateY(-15px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+/* ========================================
+   MODAL DE CONFIGURAÇÕES
+======================================== */
+
+/* Logo do Gemini no topo do modal */
+.logo-gemini {
+    display: block;
+
+    width: 60px;
+    height: 60px;
+
+    margin: 0 auto 18px;
+
+    filter: drop-shadow(0 0 6px rgba(138, 180, 248, 0.5));
+
+    animation: brilhar-logo 2.5s ease-in-out infinite;
+}/* Campo da chave do Gemini, com visual baseado nos botões */
+#campo-chave-gemini {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 14px;
+
+    font-family: 'Silkscreen', monospace;
+    font-size: 11px;
+
+    color: white;
+    background-color: #211b2b;
+
+    border: 3px solid #d4a45b;
+    box-shadow: 0 4px #42101b;
+
+    outline: none;
+    transition: 0.2s;
+}
+
+#campo-chave-gemini::placeholder {
+    color: rgba(255, 255, 255, 0.55);
+}
+
+#campo-chave-gemini:focus {
+    border-color: #f4d58d;
+}
+
+/* Botão que salva a chave, logo abaixo do campo */
+#btn-adicionar-chave {
+    margin-top: 10px;
+    box-shadow: 0 3px #42101b;
+}
+
+.dica-chave-gemini {
+    font-size: 11px;
+    line-height: 1.7;
+
+    margin-bottom: 18px;
+}
+
+/* Lista de chaves cadastradas */
+#lista-chaves-gemini {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    padding: 0;
+    margin: 0;
+}
+
+.item-chave-gemini {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    padding: 10px 12px;
+
+    background-color: #191420;
+
+    border: 2px solid #a17b43;
+}
+
+.chave-mascarada {
+    flex: 1;
+
+    font-family: 'Silkscreen', monospace;
+    font-size: 10px;
+
+    color: white;
+    word-break: break-all;
+}
+
+.badge-chave-em-uso {
+    padding: 4px 6px;
+
+    font-family: 'Silkscreen', monospace;
+    font-size: 8px;
+
+    color: #211b2b;
+    background-color: #f4d58d;
+}
+
+.btn-remover-chave {
+    padding: 5px 9px;
+
+    font-family: 'Silkscreen', monospace;
+    font-size: 10px;
+
+    color: white;
+    background-color: #751e2b;
+
+    border: 2px solid #d4a45b;
+
+    cursor: pointer;
+}
+
+.btn-remover-chave:hover {
+    background-color: #a32d3c;
+}
+
+.item-chave-vazia {
+    font-size: 11px;
+
+    color: rgba(255, 255, 255, 0.6);
+    text-align: center;
+
+    padding: 10px;
+}
+
+
+/* ========================================
+   MODAL DO BOTÃO JOGAR
+======================================== */
+
+.botoes-modal-jogar {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+/* Erro quando não existe chave cadastrada */
+.mensagem-erro {
+    font-size: 11px;
+    line-height: 1.7;
+
+    margin-bottom: 0;
+
+    color: #ff99a3;
+    text-shadow: 2px 2px #000;
+}
+
+/* Confirmação de geração concluída com sucesso */
+.mensagem-sucesso {
+    font-size: 11px;
+    line-height: 1.7;
+
+    margin-bottom: 0;
+
+    color: #7ee08c;
+    text-shadow: 2px 2px #000;
+}
+
+/* Animação da logo do Gemini enquanto algo é gerado */
+.animacao-gemini {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+
+    background-color: rgba(33, 27, 43, 0.93);
+}
+
+/* Respeita o atributo hidden */
+.animacao-gemini[hidden] {
+    display: none;
+}
+
+.logo-gemini-girando {
+    width: 74px;
+    height: 74px;
+
+    animation:
+        girar-logo 1.4s ease-in-out infinite,
+        brilhar-logo 1s ease-in-out infinite;
+}
+
+#texto-animacao-gemini {
+    font-family: 'Silkscreen', monospace;
+    font-size: 12px;
+
+    color: #f4d58d;
+    text-shadow: 2px 2px #000;
+}
+
+/* Giro suave da logo, cresce e encolhe no meio do giro */
+@keyframes girar-logo {
+    from {
+        transform: rotate(0deg) scale(1);
+    }
+
+    50% {
+        transform: rotate(180deg) scale(1.18);
+    }
+
+    to {
+        transform: rotate(360deg) scale(1);
+    }
+}
+
+/* Brilho azulado pulsando atrás da logo:
+   vai e volta dentro do próprio ciclo, sem salto entre loops */
+@keyframes brilhar-logo {
+    from,
+    to {
+        filter: drop-shadow(0 0 4px rgba(138, 180, 248, 0.35));
+    }
+
+    50% {
+        filter: drop-shadow(0 0 14px rgba(138, 180, 248, 0.85));
+    }
+}
+
+
+/* ========================================
+   RESPONSIVIDADE - TABLETS
+======================================== */
+
+@media (max-width: 800px) {
+
+    .inicio-conteudo {
+        gap: 0;
+        padding: 20px 1%;
+    }
+
+    .corredor {
+        --tamanho-corredor: clamp(130px, 16vw, 210px);
+    }
+
+    .corredor-monstro {
+        --tamanho-corredor: clamp(140px, 17vw, 225px);
+
+        left: -28vw;
+    }
+
+    .inicio-menu {
+        flex-basis: 42%;
+        min-width: 0;
+        gap: 22px;
+    }
+
+    .inicio-menu h1 {
+        font-size: clamp(22px, 4vw, 36px);
+    }
+
+    .inicio-menu p {
+        font-size: 12px;
+    }
+
+    .btn-menu-principal {
+        padding: 10px 16px;
+        font-size: 10px;
+    }
+}
+
+
+/* ========================================
+   RESPONSIVIDADE - CELULARES
+======================================== */
+
+@media (max-width: 520px) {
+
+    .barra-superior {
+        min-height: 55px;
+        padding: 10px 12px;
+    }
+
+    .btn-conta {
+        padding: 10px 14px;
+        font-size: 10px;
+    }
+
+    .divisoria-superior {
+        width: calc(100% - 30px);
+    }
+
+    .inicio-conteudo {
+        flex-wrap: wrap;
+        align-content: flex-start;
+
+        row-gap: 0;
+        padding: 15px 1%;
+    }
+
+    .corredor {
+        --tamanho-corredor: clamp(100px, 22vw, 140px);
+    }
+
+    .corredor-monstro {
+        --tamanho-corredor: clamp(110px, 23vw, 150px);
+
+        left: -22vw;
+    }
+
+    .inicio-menu {
+        order: 3;
+
+        flex: 0 0 100%;
+        min-width: 0;
+
+        gap: 16px;
+        margin-top: -8px;
+    }
+
+    .inicio-menu h1 {
+        font-size: 28px;
+        margin-bottom: -4px;
+    }
+
+    .inicio-menu p {
+        font-size: 11px;
+    }
+
+    .btn-menu-principal {
+        padding: 9px 13px;
+        font-size: 9px;
+    }
+
+    /* Modais */
+    .modal-conteudo {
+        padding: 38px 20px 25px;
+    }
+
+    .modal-conteudo h2 {
+        font-size: 16px;
+    }
+
+    .modal-conteudo p {
+        font-size: 11px;
+    }
+
+    .campo-modal label {
+        font-size: 11px;
+    }
+
+    .btn-modal {
+        font-size: 9px;
+        padding: 13px 8px;
+    }
+
+    .btn-fechar {
+        font-size: 11px;
+    }
+}

@@ -5,19 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="css/tela-inicio.css">
-    <link rel="stylesheet" href="css/tela-jogo.css">
-    <link rel="stylesheet" href="css/tela-batalha.css">
-    <link rel="stylesheet" href="css/tela-fim.css">
-    <link rel="stylesheet" href="css/sprites.css">
-    <link rel="stylesheet" href="css/painel-jogador.css">
+    <link rel="stylesheet" href="assets/css/tela-inicio.css">
+    <link rel="stylesheet" href="assets/css/tela-jogo.css">
+    <link rel="stylesheet" href="assets/css/tela-batalha.css">
+    <link rel="stylesheet" href="assets/css/tela-fim.css">
+    <link rel="stylesheet" href="assets/css/sprites.css">
+    <link rel="stylesheet" href="assets/css/painel-jogador.css">
     
     <title>WebKnight</title>
 </head>
 <body>
     <!-- Tela inicial, contendo o cadastro do email do jogador-->
     <section id="tela-inicial">
-        <!-- Barra superior -->
+        <!-- Barra de conta, acima da linha divisória -->
         <div class="barra-superior">
             <button id="btn-login" class="btn-conta">LOGIN</button>
             <button id="btn-logout" class="btn-conta" hidden>LOGOUT</button>
@@ -26,23 +26,21 @@
         <div class="divisoria-superior"></div>
 
         <div class="inicio-conteudo">
-            <!-- Personagem principal -->
-            <div class="inicio-personagem">
-                <div class="inicio-sprite cavaleiro-inicio"></div>
-            </div>
-
             <!-- Botão central -->
             <div class="inicio-menu">
                 <h1>WEBKNIGHT</h1>
                 <p>Uma aventura está prestes a começar...</p>
-                <button id="btn-iniciar">JOGAR!</button>
+                <button id="btn-iniciar" class="btn-menu-principal">JOGAR!</button>
+                <button id="btn-configuracoes" class="btn-menu-principal">CONFIGURAÇÕES</button>
             </div>
+        </div>
 
-            <!-- Vilão -->
-            <div class="inicio-personagem">
-                <div class="inicio-sprite demonio-inicio"></div>
+        <!-- Perseguição na borda inferior: o cavaleiro foge do monstro -->
+        <div class="inicio-corrida">
+            <div class="corredor corredor-cavaleiro">
+                <span class="balao-help">HELP!</span>
             </div>
-
+            <div class="corredor corredor-monstro"></div>
         </div>
 
         <!-- Modal de login -->
@@ -82,12 +80,53 @@
                 </div>
             </div>
         </div>
+
+        <!-- Modal de configurações, com as chaves da API do Gemini -->
+        <div id="modal-configuracoes" class="modal-overlay" hidden>
+            <div class="modal-conteudo">
+                <button class="btn-fechar" data-fechar="modal-configuracoes">X</button>
+                <img class="logo-gemini" src="assets/img/logotypes/Google_Gemini_icon.svg" alt="Logo do Gemini">
+                <h2>CONFIGURAÇÕES</h2>
+
+                <div class="campo-modal">
+                    <label for="campo-chave-gemini">Chave da API do Gemini</label>
+                    <input type="text" id="campo-chave-gemini" placeholder="Cole uma chave da API (AIza...)">
+                    <button id="btn-adicionar-chave" class="btn-modal">ADICIONAR CHAVE</button>
+                </div>
+
+                <p class="dica-chave-gemini">Você pode cadastrar várias chaves: o jogo faz o rodízio entre elas a cada chamada ao Gemini.</p>
+
+                <ul id="lista-chaves-gemini"></ul>
+            </div>
+        </div>
+
+        <!-- Modal aberto pelo botão de jogar -->
+        <div id="modal-jogar" class="modal-overlay" hidden>
+            <div class="modal-conteudo">
+                <button class="btn-fechar" data-fechar="modal-jogar">X</button>
+                <h2>WEBKNIGHT</h2>
+
+                <div class="botoes-modal-jogar">
+                    <button id="btn-modal-gerar-mapa" class="btn-modal">GERAR MAPA COM GEMINI</button>
+                    <button id="btn-modal-gerar-narrativa" class="btn-modal">GERAR NARRATIVA</button>
+                    <button id="btn-continuar" class="btn-modal">CONTINUAR</button>
+                </div>
+
+                <p id="erro-sem-chave" class="mensagem-erro" hidden>Configure uma chave da API do Gemini no menu de configurações antes de gerar.</p>
+
+                <p id="mensagem-sucesso" class="mensagem-sucesso" hidden></p>
+
+                <!-- Animação da logo do Gemini enquanto o mapa ou a narrativa são gerados -->
+                <div id="animacao-gemini" class="animacao-gemini" hidden>
+                    <img class="logo-gemini-girando" src="assets/img/logotypes/Google_Gemini_icon.svg" alt="Logo do Gemini girando">
+                    <span id="texto-animacao-gemini">Gerando...</span>
+                </div>
+            </div>
+        </div>
     </section>
 
     <!-- Tela com o mapa do jogo, jogador e inimigos -->
     <section id="tela-jogo">
-        <input class="chave-api" type="text" placeholder="Chave API">
-        <button class="testar-prompt-mapa">Gerar Mapa com Gemini</button>
         <div class="jogo-container">
             <div class="jogo-localizacao">
                 Floresta
@@ -111,6 +150,7 @@
 
     </section>
 
+    <script src="src/gerenciador-chaves.js"></script>
     <script src="src/script.js"></script>
     <script src="src/prompt.js"></script>
     <script src="src/mapa.js"></script>

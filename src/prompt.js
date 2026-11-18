@@ -11,8 +11,30 @@ const MONTANHA = "Montanha";
 
 const lista_regiao = [FLORESTA,CIDADE,RUINA,MONTANHA];
 
-let botaoGeminiMapa = document.querySelector(".testar-prompt-mapa")
-let inputChaveAPI = document.querySelector(".chave-api")
+let botaoModalGerarMapa = document.querySelector("#btn-modal-gerar-mapa")
+let botaoModalGerarNarrativa = document.querySelector("#btn-modal-gerar-narrativa")
+let mensagemErroSemChave = document.querySelector("#erro-sem-chave")
+let mensagemSucessoGemini = document.querySelector("#mensagem-sucesso")
+let animacaoGemini = document.querySelector("#animacao-gemini")
+let textoAnimacaoGemini = document.querySelector("#texto-animacao-gemini")
+
+// Impede a geração sem chave: mostra a mensagem de erro abaixo dos botões do modal
+function temChaveCadastrada() {
+    if (obterChavesGemini().length > 0) return true;
+
+    mensagemErroSemChave.hidden = false;
+    return false;
+}
+
+// Mostra/esconde a animação da logo do Gemini durante a geração
+function exibirAnimacaoGemini(texto) {
+    textoAnimacaoGemini.textContent = texto;
+    animacaoGemini.hidden = false;
+}
+
+function esconderAnimacaoGemini() {
+    animacaoGemini.hidden = true;
+}
 
 function cenario_aleatorio(lista_regiao){
     const indice = Math.floor(Math.random() * lista_regiao.length);
@@ -63,9 +85,10 @@ function gerar_prompt_mapa(lista_regiao){
 }
 
 async function chamar_gemini(prompt) {
-    //para testes lembre-se de trocar
-    // const API_KEY = "Chave";
-    const API_KEY = document.querySelector(".chave-api").value;
+    const API_KEY = proximaChaveGemini();
+    if (!API_KEY) {
+        throw new Error("Nenhuma chave da API do Gemini cadastrada nas configurações.");
+    }
     const MODELO = "gemini-3.5-flash";
     const URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODELO}:generateContent`;
     try {
@@ -140,8 +163,8 @@ async function chamar_gemini(prompt) {
     }    
 }
 
-// Botão temporário pra testar a criação do mapa, depois será uma função propria
-botaoGeminiMapa.addEventListener("click", async function() {
+// Gera um mapa com o Gemini (cenario sorteado) e monta a nova tela do mapa
+async function gerarMapaGemini() {
     console.log("Resultado do prompt:");
 
     const texto = gerar_prompt_mapa(lista_regiao);
@@ -156,6 +179,28 @@ botaoGeminiMapa.addEventListener("click", async function() {
         resultado.matriz_mapa,
         resultado.tipo_cenario
     );
+}
+
+// Botão de gerar mapa do modal do botão jogar
+botaoModalGerarMapa.addEventListener("click", async function() {
+    mensagemErroSemChave.hidden = true;
+    mensagemSucessoGemini.hidden = true;
+
+    if (!temChaveCadastrada()) return;
+
+    botaoModalGerarMapa.disabled = true; // evita cliques repetidos enquanto a API responde
+    exibirAnimacaoGemini("Gerando mapa...");
+
+    try {
+        await gerarMapaGemini();
+        mensagemSucessoGemini.textContent = "Mapa gerado com sucesso!";
+        mensagemSucessoGemini.hidden = false;
+    } catch (erro) {
+        console.error("Erro ao gerar o mapa:", erro);
+    } finally {
+        botaoModalGerarMapa.disabled = false;
+        esconderAnimacaoGemini();
+    }
 });
 
 // ============================================================
@@ -222,10 +267,9 @@ function obterProximoCenario(cenarioAtual) {
     return opcoes[indice];
 }
 
-// Solicita um novo mapa: via Gemini (se chave fornecida) ou via mapa padrão local
+// Solicita um novo mapa: via Gemini (se houver chave cadastrada) ou via mapa padrão local
 async function solicitarNovoMapa(cenario) {
-    const inputChave = document.querySelector(".chave-api");
-    const temChave = inputChave && inputChave.value.trim().length > 0;
+    const temChave = obterChavesGemini().length > 0;
 
     if (temChave) {
         try {
@@ -289,8 +333,8 @@ async function garantirNarrativa() {
 // Chamada ao Gemini que retorna TEXTO SIMPLES.
 // (a chamar_gemini() do mapa força um schema JSON de mapa, então não serve aqui)
 async function chamar_gemini_texto(prompt) {
-    const API_KEY = (document.querySelector(".chave-api")?.value ?? "").trim();
-    if (!API_KEY) throw new Error("Chave de API não informada.");
+    const API_KEY = proximaChaveGemini();
+    if (!API_KEY) throw new Error("Nenhuma chave da API do Gemini cadastrada nas configurações.");
 
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODELO_NARRATIVA}:generateContent`;
 
@@ -376,37 +420,39 @@ async function solicitarNovaNarrativa(cenario, mapasVisitados, descricaoMapa = "
 }
 
 // ------------------------------------------------------------
-// BOTÃO DE TESTE DA NARRATIVA — TEMPORÁRIO.
-// Criado por JavaScript, ao lado do botão do mapa (o index.html não muda).
-// Remover quando a transição de cenário chamar solicitarNovaNarrativa().
-// ------------------------------------------------------------
-function criarBotaoTesteNarrativa() {
-    const botaoMapa = document.querySelector(".testar-prompt-mapa");
-    if (!botaoMapa) return;
 
-    const botao = document.createElement("button");
-    botao.classList.add("testar-narrativa");
-    botao.textContent = "Gerar Narrativa com Gemini";
-    botaoMapa.insertAdjacentElement("afterend", botao);
+// Gera a narrativa do cenário atual e mostra na tela do jogo.
+// Usada pelo botão "Gerar Narrativa" do modal do botão jogar.
+async function gerarNarrativaGemini() {
+    // Usa a região do mapa que está na tela (guardada pelo painel-jogador.js).
+    // Se não existir, sorteia uma.
+    const regiao = (typeof dadosLocalizacao !== "undefined" && dadosLocalizacao.regiao)
+        ? dadosLocalizacao.regiao
+        : cenario_aleatorio(lista_regiao);
 
-    botao.addEventListener("click", async () => {
-        botao.disabled = true; // evita cliques repetidos enquanto a API responde
-
-        try {
-            // Usa a região do mapa que está na tela (guardada pelo painel-jogador.js).
-            // Se não existir, sorteia uma.
-            const regiao = (typeof dadosLocalizacao !== "undefined" && dadosLocalizacao.regiao)
-                ? dadosLocalizacao.regiao
-                : cenario_aleatorio(lista_regiao);
-
-            const texto = await solicitarNovaNarrativa(regiao, 0, "Cenário de teste, sem mapa associado.");
-            console.log("Narrativa gerada:", texto);
-        } catch (erro) {
-            console.error("Erro ao gerar narrativa:", erro);
-        } finally {
-            botao.disabled = false;
-        }
-    });
+    const texto = await solicitarNovaNarrativa(regiao, 0, "Cenário de teste, sem mapa associado.");
+    console.log("Narrativa gerada:", texto);
+    return texto;
 }
 
-criarBotaoTesteNarrativa();
+// Botão de gerar narrativa do modal do botão jogar
+botaoModalGerarNarrativa.addEventListener("click", async () => {
+    mensagemErroSemChave.hidden = true;
+    mensagemSucessoGemini.hidden = true;
+
+    if (!temChaveCadastrada()) return;
+
+    botaoModalGerarNarrativa.disabled = true; // evita cliques repetidos enquanto a API responde
+    exibirAnimacaoGemini("Escrevendo narrativa...");
+
+    try {
+        await gerarNarrativaGemini();
+        mensagemSucessoGemini.textContent = "Narrativa gerada com sucesso!";
+        mensagemSucessoGemini.hidden = false;
+    } catch (erro) {
+        console.error("Erro ao gerar narrativa:", erro);
+    } finally {
+        botaoModalGerarNarrativa.disabled = false;
+        esconderAnimacaoGemini();
+    }
+});
