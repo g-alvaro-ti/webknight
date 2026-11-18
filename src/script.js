@@ -39,6 +39,17 @@ function entrarNoJogo(){
     window.scrollTo(0, 0);
 }
 
+function entrarNoJogo(){
+    const modalJogar = document.querySelector("#modal-jogar");
+    if (modalJogar) modalJogar.hidden = true;
+
+    // Esconde a tela inicial
+    exibirTelaInicial(true);
+
+    // Mostra a tela do jogo
+    exibirJogo(false);
+}
+
 // Inicialização das telas
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -53,9 +64,16 @@ document.addEventListener("DOMContentLoaded", () => {
     // Evento do botão iniciar
     modalJogar = document.querySelector("#modal-jogar");
     const botaoIniciar = document.querySelector("#btn-iniciar");
+<<<<<<< HEAD
+=======
+    const modalJogar = document.querySelector("#modal-jogar");
+    const botaoContinuarSemGemini = document.querySelector("#btn-continuar-sem-gemini");
+>>>>>>> 518dc99c77827695117ab58c5e355c5f4c1448d5
 
     if (botaoIniciar) {
         botaoIniciar.addEventListener("click", () => {
+            const erroSemChave = document.querySelector("#erro-sem-chave");
+            if (erroSemChave) erroSemChave.hidden = true;
 
             // Mostra o modal com as opções antes de entrar no jogo
             modalJogar.hidden = false;
@@ -63,6 +81,18 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+<<<<<<< HEAD
+=======
+    // Continuar sem Gemini fecha o modal e entra na tela do jogo
+    if (botaoContinuarSemGemini) {
+        botaoContinuarSemGemini.addEventListener("click", () => {
+
+            entrarNoJogo();
+
+        });
+    }
+
+>>>>>>> 518dc99c77827695117ab58c5e355c5f4c1448d5
     // login logout
 
     const btnLogin = document.querySelector("#btn-login");

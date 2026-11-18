@@ -548,12 +548,12 @@ let carregandoMapa = false;
 // 1. Detectar quando o jogador entra em uma célula com inimigo
 // 2. Exibir uma mensagem no console indicando o encontro, sem implementar batalhas
 function detectarEncontroInimigo(linha, coluna, celula) {
-    console.log(`⚔️ [Encontro] O jogador entrou em uma célula com um inimigo na posição [${linha}, ${coluna}]! (Batalhas não implementadas nesta etapa)`);
+    console.log(`Encontro com inimigo em [${linha}, ${coluna}]`);
 }
 
 // 3. Detectar quando o jogador alcança a saída
 function detectarSaida(linha, coluna) {
-    console.log(`🏁 [Saída] O jogador alcançou a saída na posição [${linha}, ${coluna}]! Solicitando novo mapa e nova narrativa...`);
+    console.log(`Saída alcançada em [${linha}, ${coluna}]`);
     trocarDeMapa();
 }
 
@@ -566,20 +566,22 @@ async function trocarDeMapa() {
     // Esvazia fila de movimentos para evitar passos residuais durante o carregamento
     filaInputs.length = 0;
 
+    const cenarioAtual = (typeof dadosLocalizacao !== "undefined" && dadosLocalizacao.regiao)
+        ? dadosLocalizacao.regiao
+        : "Floresta";
+
+    const proximoCenario = (typeof obterProximoCenario === "function")
+        ? obterProximoCenario(cenarioAtual)
+        : cenario_aleatorio(lista_regiao);
+
+    const numeroProximoMapa = (typeof dadosLocalizacao !== "undefined" && dadosLocalizacao.mapasVisitados)
+        ? dadosLocalizacao.mapasVisitados + 1
+        : 2;
+
+    let mapaAtualizado = false;
+
     try {
-        const cenarioAtual = (typeof dadosLocalizacao !== "undefined" && dadosLocalizacao.regiao)
-            ? dadosLocalizacao.regiao
-            : "Floresta";
-
-        const proximoCenario = (typeof obterProximoCenario === "function")
-            ? obterProximoCenario(cenarioAtual)
-            : cenario_aleatorio(lista_regiao);
-
-        const numeroProximoMapa = (typeof dadosLocalizacao !== "undefined" && dadosLocalizacao.mapasVisitados)
-            ? dadosLocalizacao.mapasVisitados + 1
-            : 2;
-
-        console.log(`🔄 [Troca de Mapa] Carregando Mapa #${numeroProximoMapa} — Região: ${proximoCenario}...`);
+        console.log(`Carregando mapa ${numeroProximoMapa} (${proximoCenario})`);
 
         // Feedback imediato na tela
         const elNarrativa = document.querySelector(".jogo-narrativa");
@@ -587,17 +589,25 @@ async function trocarDeMapa() {
             elNarrativa.textContent = `Avançando para ${proximoCenario}... Carregando novo mapa e narrativa...`;
         }
 
-        // Solicita o novo mapa e a nova narrativa
-        const [dadosMapa, novaNarrativa] = await Promise.all([
-            solicitarNovoMapa(proximoCenario),
-            solicitarNovaNarrativa(proximoCenario, numeroProximoMapa)
-        ]);
+        // Dispara narrativa em paralelo, mas atualiza o mapa assim que ele (ou o padrão) responder
+        const promessaNarrativa = solicitarNovaNarrativa(proximoCenario, numeroProximoMapa);
+        const dadosMapa = await solicitarNovoMapa(proximoCenario);
 
-        // Atualiza a tela com o novo mapa e narrativa, preservando as estatísticas da sessão
-        atualizarTelaComNovoMapa(dadosMapa.matriz_mapa, dadosMapa.tipo_cenario, novaNarrativa);
+        gerarMapa(dadosMapa.matriz_mapa, dadosMapa.tipo_cenario);
+        mapaAtualizado = true;
 
+        const novaNarrativa = await promessaNarrativa;
+        if (elNarrativa && novaNarrativa) {
+            elNarrativa.textContent = novaNarrativa;
+        }
+
+        console.log(`Novo mapa carregado: ${dadosMapa.tipo_cenario}`);
     } catch (erro) {
         console.error("Erro durante a troca de mapas:", erro);
+        if (!mapaAtualizado && typeof obterMapaPadrao === "function") {
+            const mapaPadrao = obterMapaPadrao(proximoCenario);
+            atualizarTelaComNovoMapa(mapaPadrao.matriz_mapa, mapaPadrao.tipo_cenario);
+        }
     } finally {
         carregandoMapa = false;
     }
@@ -615,5 +625,5 @@ function atualizarTelaComNovoMapa(matrizMapa, tipoCenario, novaNarrativa) {
         elNarrativa.textContent = novaNarrativa;
     }
 
-    console.log(`✅ [Tela Atualizada] Novo mapa [${tipoCenario}] carregado na tela. Narrativa atualizada e estatísticas da sessão preservadas com sucesso!`);
+    console.log(`Novo mapa carregado: ${tipoCenario}`);
 }

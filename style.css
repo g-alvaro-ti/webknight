@@ -32,11 +32,7 @@ section[hidden] {
 /* Usado pra esconder telas, ou elementos específicos da página */
 /* Exemplo no JS: elementoHTML.classList.toggle("hidden",true) */
 .hidden {
-    display: none;
-}
-
-.hidden{
-    display: none;
+    display: none !important;
 }
 
 /* Cores pra ajudar a delimitar as telas*/

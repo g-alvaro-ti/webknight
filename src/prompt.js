@@ -11,10 +11,13 @@ const MONTANHA = "Montanha";
 
 const lista_regiao = [FLORESTA,CIDADE,RUINA,MONTANHA];
 
+<<<<<<< HEAD
 let botaoModalGeminiSim = document.querySelector("#btn-modal-gemini-sim")
 let botaoModalGeminiNao = document.querySelector("#btn-modal-gemini-nao")
+=======
+let botaoContinuarComGemini = document.querySelector("#btn-continuar-com-gemini")
+>>>>>>> 518dc99c77827695117ab58c5e355c5f4c1448d5
 let mensagemErroSemChave = document.querySelector("#erro-sem-chave")
-let mensagemSucessoGemini = document.querySelector("#mensagem-sucesso")
 let animacaoGemini = document.querySelector("#animacao-gemini")
 let textoAnimacaoGemini = document.querySelector("#texto-animacao-gemini")
 
@@ -84,20 +87,56 @@ function gerar_prompt_mapa(lista_regiao){
     return prompt;
 }
 
-async function chamar_gemini(prompt) {
-    const API_KEY = proximaChaveGemini();
-    if (!API_KEY) {
-        throw new Error("Nenhuma chave da API do Gemini cadastrada nas configurações.");
+function exibirMapaCarregamento() {
+    const container = document.querySelector(".jogo-mapa-container");
+    if (!container) return;
+
+    container.innerHTML = "";
+    if (typeof inimigos !== "undefined") inimigos.length = 0;
+    if (typeof jogadorElemento !== "undefined") jogadorElemento = null;
+
+    const linhas = 10;
+    const colunas = 15;
+    const linhaJogador = 4;
+    const colunaJogador = 7;
+    const linhaPontos = 6;
+    const colunasPontos = [5, 7, 9];
+
+    for (let i = 0; i < linhas; i++) {
+        for (let j = 0; j < colunas; j++) {
+            const celula = document.createElement("div");
+            celula.classList.add("mapa-celula");
+
+            const ehPonto = i === linhaPontos && colunasPontos.includes(j);
+            celula.style.backgroundColor = ehPonto ? "#FFFFFF" : "#31081f";
+
+            if (i === linhaJogador && j === colunaJogador) {
+                adicionarSpriteAnimado(celula, "cavaleiro-idle", 2);
+            }
+
+            container.appendChild(celula);
+        }
     }
+}
+
+const TIMEOUT_MAPA_MS = 15000;
+
+async function chamar_gemini(prompt) {
+    exibirMapaCarregamento();
+    const API_KEY = proximaChaveGemini();
     const MODELO = "gemini-3.5-flash";
     const URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODELO}:generateContent`;
     try {
+        if (!API_KEY) {
+            throw new Error("Chave de API não informada.");
+        }
         const resposta = await fetch(URL, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
                 "x-goog-api-key": API_KEY
             },
+            signal: AbortSignal.timeout(TIMEOUT_MAPA_MS),
             body: JSON.stringify({
                 contents: [
                     {
@@ -163,25 +202,38 @@ async function chamar_gemini(prompt) {
     }    
 }
 
+<<<<<<< HEAD
 // Gera um mapa com o Gemini (cenario sorteado) e monta a nova tela do mapa.
 // Retorna o resultado completo (tipo_cenario, descricao, matriz_mapa) pra
 // alimentar a narrativa logo em seguida.
 async function gerarMapaGemini() {
+=======
+// Gera um mapa com o Gemini (cenario sorteado) e monta a nova tela do mapa
+async function gerarMapaGemini(cenarioSorteado = cenario_aleatorio(lista_regiao)) {
+>>>>>>> 518dc99c77827695117ab58c5e355c5f4c1448d5
     console.log("Resultado do prompt:");
 
-    const texto = gerar_prompt_mapa(lista_regiao);
+    const texto = gerar_prompt_mapa([cenarioSorteado]);
     const resposta_prompt = await chamar_gemini(texto);
 
     console.log(resposta_prompt);
 
     const resultado = JSON.parse(resposta_prompt);
+    if (!resultado || !mapaMatrizValida(resultado.matriz_mapa)) {
+        throw new Error("Matriz de mapa inválida retornada pelo Gemini.");
+    }
+
+    const cenarioFinal = (typeof CORES_REGIOES !== "undefined" && CORES_REGIOES[resultado.tipo_cenario])
+        ? resultado.tipo_cenario
+        : cenarioSorteado;
 
     // Gera o mapa no HTML, com a função do mapa.js
     gerarMapa(
         resultado.matriz_mapa,
-        resultado.tipo_cenario
+        cenarioFinal
     );
 
+<<<<<<< HEAD
     return resultado;
 }
 
@@ -257,6 +309,14 @@ botaoModalGeminiNao.addEventListener("click", () => {
     entrarNoJogo();
 });
 
+=======
+    return {
+        tipoCenario: cenarioFinal,
+        descricao: resultado.descricao || ""
+    };
+}
+
+>>>>>>> 518dc99c77827695117ab58c5e355c5f4c1448d5
 // ============================================================
 // Pessoa 8 (Breno Oliveira) — Geração e solicitação de mapa
 // ============================================================
@@ -313,6 +373,28 @@ const MAPAS_PADRAO = {
     ]
 };
 
+/** Valida se a matriz possui dimensões válidas, jogador e saída. */
+function mapaMatrizValida(matriz) {
+    if (!Array.isArray(matriz) || matriz.length === 0) return false;
+    let temJogador = false;
+    let temSaida = false;
+    for (const linha of matriz) {
+        if (!Array.isArray(linha) || linha.length === 0) return false;
+        if (linha.includes(JOGADOR)) temJogador = true;
+        if (linha.includes(SAIDA)) temSaida = true;
+    }
+    return temJogador && temSaida;
+}
+
+/** Retorna uma cópia de um dos mapas padrão locais para o cenário informado. */
+function obterMapaPadrao(cenario) {
+    const cenarioValido = MAPAS_PADRAO[cenario] ? cenario : FLORESTA;
+    return {
+        matriz_mapa: MAPAS_PADRAO[cenarioValido].map(linha => [...linha]),
+        tipo_cenario: cenarioValido
+    };
+}
+
 // Retorna o próximo cenário aleatório, preferencialmente diferente do cenário atual
 function obterProximoCenario(cenarioAtual) {
     const opcoes = lista_regiao.filter(r => r !== cenarioAtual);
@@ -327,28 +409,24 @@ async function solicitarNovoMapa(cenario) {
 
     if (temChave) {
         try {
-            console.log(`[Pessoa 8] Solicitando novo mapa via Gemini para o cenário: ${cenario}...`);
+            console.log(`Gerando mapa para: ${cenario}`);
             const prompt = gerar_prompt_mapa([cenario]);
             const respostaPrompt = await chamar_gemini(prompt);
             const resultado = JSON.parse(respostaPrompt);
 
-            if (resultado && resultado.matriz_mapa && Array.isArray(resultado.matriz_mapa)) {
+            if (resultado && mapaMatrizValida(resultado.matriz_mapa)) {
                 return {
                     matriz_mapa: resultado.matriz_mapa,
                     tipo_cenario: cenario
                 };
             }
         } catch (erro) {
-            console.warn("[Pessoa 8] Falha ao gerar mapa via Gemini. Usando mapa local de fallback.", erro);
+            console.warn("Erro ao gerar mapa, usando mapa padrão.", erro);
         }
     }
 
     // Fallback local se não houver chave ou requisição falhar
-    const matriz = MAPAS_PADRAO[cenario] || MAPAS_PADRAO["Floresta"];
-    return {
-        matriz_mapa: matriz.map(linha => [...linha]),
-        tipo_cenario: cenario
-    };
+    return obterMapaPadrao(cenario);
 }
 
 // ============================================================
@@ -468,8 +546,66 @@ async function gerarNarrativa({ tipoCenario = "Floresta", descricaoMapa = "", fo
 // Gera a narrativa do cenário atual e mostra na tela do jogo.
 // "descricaoMapa" é a descricao que o Gemini devolve junto com o mapa (opcional).
 // "mapasVisitados" não é mais usado: a Narrativa conta as transições sozinha.
+const NARRATIVAS_FALLBACK_LOCAL = {
+    "Floresta": "Você adentra uma parte mais densa da Floresta. Sombras se movem entre as árvores à sua frente.",
+    "Cidade": "Você cruza os portões de uma Cidade silenciosa. Becos escuros escondem perigos à sua espera.",
+    "Ruina": "Você penetra nos corredores de uma Ruína ancestral. Criaturas observam sua chegada na escuridão.",
+    "Montanha": "O vento gélido ruge pelos desfiladeiros da Montanha. A trilha à frente exige cautela."
+};
+
 async function solicitarNovaNarrativa(cenario, mapasVisitados, descricaoMapa = "") {
+<<<<<<< HEAD
     await garantirNarrativa();
     const { texto } = await gerarNarrativa({ tipoCenario: cenario, descricaoMapa });
     return texto;
 }
+=======
+    try {
+        await garantirNarrativa();
+        const { texto } = await gerarNarrativa({ tipoCenario: cenario, descricaoMapa });
+        return texto;
+    } catch (erro) {
+        console.warn("Erro ao solicitar narrativa, usando fallback local.", erro);
+        const textoFallback = NARRATIVAS_FALLBACK_LOCAL[cenario] || NARRATIVAS_FALLBACK_LOCAL[FLORESTA];
+        exibirNarrativa(textoFallback);
+        return textoFallback;
+    }
+}
+
+// ------------------------------------------------------------
+
+// Botão "Continuar com Gemini" do modal do botão jogar: gera mapa e narrativa antes de entrar no jogo
+if (botaoContinuarComGemini) {
+    botaoContinuarComGemini.addEventListener("click", async () => {
+        mensagemErroSemChave.hidden = true;
+
+        if (!temChaveCadastrada()) return;
+
+        botaoContinuarComGemini.disabled = true; // evita cliques repetidos enquanto a API responde
+        exibirAnimacaoGemini("Gerando mapa e narrativa...");
+
+        const cenarioSorteado = cenario_aleatorio(lista_regiao);
+        let cenarioFinal = cenarioSorteado;
+        let descricaoMapa = "";
+
+        try {
+            const dadosMapa = await gerarMapaGemini(cenarioSorteado);
+            cenarioFinal = dadosMapa.tipoCenario;
+            descricaoMapa = dadosMapa.descricao;
+        } catch (erro) {
+            console.warn("Falha ao gerar mapa via Gemini. Carregando mapa padrão.", erro);
+            const mapaPadrao = obterMapaPadrao(cenarioSorteado);
+            gerarMapa(mapaPadrao.matriz_mapa, mapaPadrao.tipo_cenario);
+        }
+
+        try {
+            await solicitarNovaNarrativa(cenarioFinal, 0, descricaoMapa);
+        } finally {
+            botaoContinuarComGemini.disabled = false;
+            esconderAnimacaoGemini();
+        }
+
+        entrarNoJogo();
+    });
+}
+>>>>>>> 518dc99c77827695117ab58c5e355c5f4c1448d5

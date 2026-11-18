@@ -73,7 +73,8 @@ function renderizarListaChaves() {
 
     lista.innerHTML = "";
 
-    if (chavesGemini.length === 0) {
+    if (chavesGemini.length === 0)
+         {
         const itemVazio = document.createElement("li");
         itemVazio.classList.add("item-chave-vazia");
         itemVazio.textContent = "Nenhuma chave cadastrada ainda.";
