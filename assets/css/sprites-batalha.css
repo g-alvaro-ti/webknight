@@ -21,3 +21,8 @@
 
     filter: drop-shadow(0px 6px 8px rgba(0, 0, 0, 0.85));
 }
+
+/* Espelha horizontalmente apenas o sprite do inimigo para encarar o jogador */
+.batalha-inimigo .batalha-base-sprite .batalha-sprite {
+    transform: scaleX(-1);
+}
