@@ -102,8 +102,8 @@
     text-shadow: 0px 2px var(--cor-escuro1);
 }
 
-/* Placeholder em formato de losango para os sprites */
-.batalha-sprite-placeholder {
+/* Base em formato de losango atrás dos sprites */
+.batalha-base-sprite {
     width: clamp(88px, 12vw, 130px);
     height: clamp(88px, 12vw, 130px);
     margin: clamp(24px, 3.5vh, 36px) 0 clamp(14px, 2vh, 22px);
@@ -297,7 +297,7 @@
         gap: 14px;
     }
 
-    .batalha-sprite-placeholder {
+    .batalha-base-sprite {
         width: 76px;
         height: 76px;
     }
