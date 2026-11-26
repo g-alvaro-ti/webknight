@@ -36,6 +36,9 @@ function entrarNoJogo(){
     // Mostra a tela do jogo
     exibirJogo(false);
 
+    // Inicia a música de fundo do cenário atual
+    if (typeof tocarMusicaMapa === "function") tocarMusicaMapa();
+
     // Garante que a tela do jogo comece visível do topo
     window.scrollTo(0, 0);
 }

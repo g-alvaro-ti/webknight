@@ -242,6 +242,16 @@ function gerarMapa(matriz_mapa, tipo_cenario) {
     // Atualiza a indicação de localização na tela do jogo
     const elLocalizacao = document.querySelector(".jogo-localizacao");
     if (elLocalizacao) elLocalizacao.textContent = tipo_cenario;
+
+    // Atualiza/toca a música do cenário quando a tela do jogo estiver visível
+    if (typeof gerenciadorAudio !== "undefined") {
+        const telaJogo = document.querySelector("#tela-jogo");
+        if (telaJogo && !telaJogo.hidden) {
+            tocarMusicaMapa(tipo_cenario);
+        } else {
+            gerenciadorAudio.cenarioAtual = tipo_cenario;
+        }
+    }
 }
 
 // Teste para sempre carregar a página com um mapa padrão,
@@ -286,6 +296,8 @@ function moverJogador(dx, dy) {
     moverSpriteComRastro(jogadorElemento, celulaAtual, celulaDestino, dx, dy);
 
     jogadorPosicao = { linha: novaLinha, coluna: novaColuna };
+
+    if (typeof tocarSomAndar === "function") tocarSomAndar();
 
     // Todos os inimigos tentam se movimentar após o jogador se mover
     moverInimigos();
@@ -549,6 +561,7 @@ let carregandoMapa = false;
 // 2. Exibir uma mensagem no console indicando o encontro, sem implementar batalhas
 function detectarEncontroInimigo(linha, coluna, celula) {
     console.log(`Encontro com inimigo em [${linha}, ${coluna}]`);
+    if (typeof tocarSomInimigo === "function") tocarSomInimigo();
 }
 
 // 3. Detectar quando o jogador alcança a saída
