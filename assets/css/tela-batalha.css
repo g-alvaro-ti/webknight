@@ -169,6 +169,11 @@
     min-height: clamp(64px, 10vh, 92px);
     padding: 12px;
 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+
     font-family: 'Silkscreen', monospace;
     font-size: clamp(0.9rem, 1.55vw, 1.15rem);
     font-weight: bold;
@@ -176,116 +181,67 @@
 
     color: white;
     text-shadow: 0px 2px 0px var(--cor-escuro1), 0px 0px 6px rgba(14, 0, 4, 0.85);
-    background-color: var(--cor-escuro2);
+    background: linear-gradient(180deg, var(--cor-cinza1) 0%, #000000 100%);
 
-    border: 3px solid var(--cor-cinza2);
+    border: 4px solid var(--btn-cor-borda, var(--cor-cinza2));
     outline: 3px solid var(--cor-escuro1);
     border-radius: 5px;
+    box-shadow:
+        0px 6px 0px var(--btn-cor-sombra, var(--cor-escuro1)),
+        0px 0px 14px var(--btn-cor-brilho, rgba(0, 0, 0, 0.45)),
+        inset 0px 3px 0px rgba(255, 255, 255, 0.25);
 
     cursor: pointer;
     transition: filter 0.15s ease, transform 0.12s ease, box-shadow 0.15s ease;
 }
 
+.batalha-btn-icone {
+    width: 1.25em;
+    height: 1.25em;
+    flex-shrink: 0;
+    filter: drop-shadow(0px 2px 0px var(--cor-escuro1));
+}
+
 .batalha-btn:hover {
     transform: translateY(-3px) scale(1.02);
     filter: brightness(1.12);
+    box-shadow:
+        0px 7px 0px var(--btn-cor-sombra, var(--cor-escuro1)),
+        0px 0px 20px var(--btn-cor-brilho, rgba(0, 0, 0, 0.6)),
+        inset 0px 3px 0px rgba(255, 255, 255, 0.35);
 }
 
 .batalha-btn:active {
     transform: translateY(3px);
+    box-shadow:
+        0px 2px 0px var(--btn-cor-sombra, var(--cor-escuro1)),
+        0px 0px 10px var(--btn-cor-brilho, rgba(0, 0, 0, 0.4)),
+        inset 0px 2px 0px rgba(255, 255, 255, 0.2);
 }
 
-/* Cores vibrantes individuais por ação */
+/* Bordas coloridas individuais usando as cores originais */
 .batalha-btn-atacar {
-    background: linear-gradient(180deg, #e53935 0%, #9e1414 100%);
-    border-color: #ff8a80;
-    box-shadow:
-        0px 6px 0px #520909,
-        0px 0px 18px rgba(229, 57, 53, 0.5),
-        inset 0px 3px 0px rgba(255, 255, 255, 0.35);
-}
-
-.batalha-btn-atacar:hover {
-    box-shadow:
-        0px 7px 0px #520909,
-        0px 0px 24px rgba(255, 100, 90, 0.75),
-        inset 0px 3px 0px rgba(255, 255, 255, 0.45);
-}
-
-.batalha-btn-atacar:active {
-    box-shadow:
-        0px 2px 0px #520909,
-        0px 0px 12px rgba(229, 57, 53, 0.45),
-        inset 0px 2px 0px rgba(255, 255, 255, 0.25);
+    --btn-cor-borda: #e53935;
+    --btn-cor-sombra: #520909;
+    --btn-cor-brilho: rgba(229, 57, 53, 0.55);
 }
 
 .batalha-btn-defender {
-    background: linear-gradient(180deg, #2196f3 0%, #12488f 100%);
-    border-color: #82caff;
-    box-shadow:
-        0px 6px 0px #09244a,
-        0px 0px 18px rgba(33, 150, 243, 0.5),
-        inset 0px 3px 0px rgba(255, 255, 255, 0.35);
-}
-
-.batalha-btn-defender:hover {
-    box-shadow:
-        0px 7px 0px #09244a,
-        0px 0px 24px rgba(100, 185, 255, 0.75),
-        inset 0px 3px 0px rgba(255, 255, 255, 0.45);
-}
-
-.batalha-btn-defender:active {
-    box-shadow:
-        0px 2px 0px #09244a,
-        0px 0px 12px rgba(33, 150, 243, 0.45),
-        inset 0px 2px 0px rgba(255, 255, 255, 0.25);
+    --btn-cor-borda: #2196f3;
+    --btn-cor-sombra: #09244a;
+    --btn-cor-brilho: rgba(33, 150, 243, 0.55);
 }
 
 .batalha-btn-item {
-    background: linear-gradient(180deg, #27ae60 0%, #146335 100%);
-    border-color: #7bf0a8;
-    box-shadow:
-        0px 6px 0px #0a361d,
-        0px 0px 18px rgba(39, 174, 96, 0.5),
-        inset 0px 3px 0px rgba(255, 255, 255, 0.35);
-}
-
-.batalha-btn-item:hover {
-    box-shadow:
-        0px 7px 0px #0a361d,
-        0px 0px 24px rgba(90, 235, 150, 0.75),
-        inset 0px 3px 0px rgba(255, 255, 255, 0.45);
-}
-
-.batalha-btn-item:active {
-    box-shadow:
-        0px 2px 0px #0a361d,
-        0px 0px 12px rgba(39, 174, 96, 0.45),
-        inset 0px 2px 0px rgba(255, 255, 255, 0.25);
+    --btn-cor-borda: #27ae60;
+    --btn-cor-sombra: #0a361d;
+    --btn-cor-brilho: rgba(39, 174, 96, 0.55);
 }
 
 .batalha-btn-fugir {
-    background: linear-gradient(180deg, #f39c12 0%, #9c5206 100%);
-    border-color: #ffe082;
-    box-shadow:
-        0px 6px 0px #4f2803,
-        0px 0px 18px rgba(243, 156, 18, 0.5),
-        inset 0px 3px 0px rgba(255, 255, 255, 0.35);
-}
-
-.batalha-btn-fugir:hover {
-    box-shadow:
-        0px 7px 0px #4f2803,
-        0px 0px 24px rgba(255, 200, 75, 0.75),
-        inset 0px 3px 0px rgba(255, 255, 255, 0.45);
-}
-
-.batalha-btn-fugir:active {
-    box-shadow:
-        0px 2px 0px #4f2803,
-        0px 0px 12px rgba(243, 156, 18, 0.45),
-        inset 0px 2px 0px rgba(255, 255, 255, 0.25);
+    --btn-cor-borda: #f39c12;
+    --btn-cor-sombra: #4f2803;
+    --btn-cor-brilho: rgba(243, 156, 18, 0.55);
 }
 
 /* Estado desativado dos botões de ação */
@@ -293,7 +249,7 @@
 .batalha-acoes .batalha-btn:disabled:hover,
 .batalha-acoes .batalha-btn:disabled:active {
     color: rgba(255, 255, 255, 0.55);
-    border-color: var(--cor-cinza1);
+    border-color: var(--cor-cinza2);
     box-shadow: 0px 2px 0px var(--cor-escuro1);
     filter: grayscale(0.75) brightness(0.6);
     opacity: 0.65;
