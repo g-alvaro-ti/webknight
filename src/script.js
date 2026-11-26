@@ -43,9 +43,11 @@ function entrarNoJogo(){
 // Inicialização das telas
 document.addEventListener("DOMContentLoaded", () => {
 
-    // Esconde as telas que não devem aparecer inicialmente
+    // Temporário: Mostra apenas #tela-batalha ao abrir a página.
+    // Para reverter: remova `exibirTelaInicial(true);` e troque `exibirBatalhaTurno(false);` por `exibirBatalhaTurno(true);`.
+    exibirTelaInicial(true);
     exibirJogo(true);
-    exibirBatalhaTurno(true);
+    exibirBatalhaTurno(false);
     exibirTelaFinal(true);
 
     // Garante que a página abra sempre na tela inicial, sem rolagem residual

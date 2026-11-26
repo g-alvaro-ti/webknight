@@ -2,9 +2,14 @@
     position: relative;
     isolation: isolate;
     overflow: hidden;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(16px, 3vh, 32px) clamp(16px, 3vw, 40px);
 }
 
-/* Imagem de fundo com blur */
+/* Imagem de fundo */
 #tela-batalha::before {
     content: "";
     position: absolute;
@@ -18,4 +23,281 @@
         url("../dungeon.gif") center / cover no-repeat;
 
     z-index: -1;
+}
+
+/* Container principal da batalha */
+.batalha-container {
+    width: 100%;
+    max-width: 980px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: clamp(28px, 5vh, 52px);
+}
+
+/* ========================================
+   ARENA (JOGADOR À ESQUERDA, INIMIGO À DIREITA)
+   ======================================== */
+
+.batalha-arena {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(20px, 5vw, 72px);
+    align-items: start;
+}
+
+.batalha-combatente {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(10px, 1.8vh, 16px);
+}
+
+.batalha-nome {
+    font-size: clamp(0.95rem, 2vw, 1.35rem);
+    font-weight: bold;
+    text-transform: uppercase;
+    text-align: center;
+    letter-spacing: 1px;
+
+    color: white;
+    text-shadow: 0px 2px rgb(255, 0, 0, 1);
+}
+
+/* Barra de HP */
+.batalha-hp-barra {
+    position: relative;
+    width: 100%;
+    max-width: 340px;
+    height: clamp(28px, 4vh, 36px);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background-color: var(--cor-escuro1);
+    border: 3px solid var(--cor-cinza2);
+    outline: 3px solid var(--cor-cinza1);
+    border-radius: 3px;
+    box-shadow: 0px 5px var(--cor-cinza1), 0px 0px 10px rgb(0, 0, 0);
+    overflow: hidden;
+}
+
+.batalha-hp-preenchimento {
+    position: absolute;
+    inset: 0 auto 0 0;
+
+    background: linear-gradient(180deg, #9a1b2a, var(--cor-vermelho));
+    transition: width 0.3s ease;
+}
+
+.batalha-hp-texto {
+    position: relative;
+    z-index: 1;
+
+    font-size: clamp(0.7rem, 1.3vw, 0.9rem);
+    font-weight: bold;
+    color: white;
+    text-shadow: 0px 2px var(--cor-escuro1);
+}
+
+/* Placeholder quadrado para os sprites */
+.batalha-sprite-placeholder {
+    width: clamp(110px, 16vw, 165px);
+    height: clamp(110px, 16vw, 165px);
+    margin-top: clamp(8px, 1.5vh, 16px);
+
+    background-color: color-mix(in srgb, var(--cor-cinza1) 80%, transparent);
+    border: 2px solid var(--cor-cinza2);
+    border-radius: 5px;
+    box-shadow: 0px 0px 12px rgb(0, 0, 0);
+}
+
+/* ========================================
+   HUD INFERIOR (CAIXA DE TEXTO + 4 BOTÕES)
+   ======================================== */
+
+.batalha-hud {
+    display: grid;
+    grid-template-columns: 1.25fr 1fr;
+    gap: clamp(16px, 2.5vw, 28px);
+    align-items: stretch;
+}
+
+.batalha-caixa-texto {
+    min-height: clamp(150px, 24vh, 210px);
+    padding: clamp(16px, 2.5vw, 24px);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+
+    background-color: var(--cor-escuro2);
+    border: 3px solid var(--cor-cinza2);
+    outline: 3px solid var(--cor-cinza1);
+    border-radius: 5px;
+    box-shadow: 0px 5px var(--cor-cinza1), 0px 0px 12px rgb(0, 0, 0);
+
+    color: white;
+    font-size: clamp(0.85rem, 1.5vw, 1.1rem);
+    font-weight: bold;
+    line-height: 1.6;
+    text-shadow: 0px 2px rgb(255, 0, 0, 1);
+}
+
+.batalha-acoes {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: clamp(12px, 1.8vw, 18px);
+}
+
+.batalha-btn {
+    min-height: clamp(64px, 10vh, 92px);
+    padding: 12px;
+
+    font-family: 'Silkscreen', monospace;
+    font-size: clamp(0.9rem, 1.55vw, 1.15rem);
+    font-weight: bold;
+    letter-spacing: 1px;
+
+    color: white;
+    text-shadow: 0px 2px 0px var(--cor-escuro1), 0px 0px 6px rgba(14, 0, 4, 0.85);
+    background-color: var(--cor-escuro2);
+
+    border: 3px solid var(--cor-cinza2);
+    outline: 3px solid var(--cor-escuro1);
+    border-radius: 5px;
+
+    cursor: pointer;
+    transition: filter 0.15s ease, transform 0.12s ease, box-shadow 0.15s ease;
+}
+
+.batalha-btn:hover {
+    transform: translateY(-3px) scale(1.02);
+    filter: brightness(1.12);
+}
+
+.batalha-btn:active {
+    transform: translateY(3px);
+}
+
+/* Cores vibrantes individuais por ação */
+.batalha-btn-atacar {
+    background: linear-gradient(180deg, #e53935 0%, #9e1414 100%);
+    border-color: #ff8a80;
+    box-shadow:
+        0px 6px 0px #520909,
+        0px 0px 18px rgba(229, 57, 53, 0.5),
+        inset 0px 3px 0px rgba(255, 255, 255, 0.35);
+}
+
+.batalha-btn-atacar:hover {
+    box-shadow:
+        0px 7px 0px #520909,
+        0px 0px 24px rgba(255, 100, 90, 0.75),
+        inset 0px 3px 0px rgba(255, 255, 255, 0.45);
+}
+
+.batalha-btn-atacar:active {
+    box-shadow:
+        0px 2px 0px #520909,
+        0px 0px 12px rgba(229, 57, 53, 0.45),
+        inset 0px 2px 0px rgba(255, 255, 255, 0.25);
+}
+
+.batalha-btn-defender {
+    background: linear-gradient(180deg, #2196f3 0%, #12488f 100%);
+    border-color: #82caff;
+    box-shadow:
+        0px 6px 0px #09244a,
+        0px 0px 18px rgba(33, 150, 243, 0.5),
+        inset 0px 3px 0px rgba(255, 255, 255, 0.35);
+}
+
+.batalha-btn-defender:hover {
+    box-shadow:
+        0px 7px 0px #09244a,
+        0px 0px 24px rgba(100, 185, 255, 0.75),
+        inset 0px 3px 0px rgba(255, 255, 255, 0.45);
+}
+
+.batalha-btn-defender:active {
+    box-shadow:
+        0px 2px 0px #09244a,
+        0px 0px 12px rgba(33, 150, 243, 0.45),
+        inset 0px 2px 0px rgba(255, 255, 255, 0.25);
+}
+
+.batalha-btn-item {
+    background: linear-gradient(180deg, #27ae60 0%, #146335 100%);
+    border-color: #7bf0a8;
+    box-shadow:
+        0px 6px 0px #0a361d,
+        0px 0px 18px rgba(39, 174, 96, 0.5),
+        inset 0px 3px 0px rgba(255, 255, 255, 0.35);
+}
+
+.batalha-btn-item:hover {
+    box-shadow:
+        0px 7px 0px #0a361d,
+        0px 0px 24px rgba(90, 235, 150, 0.75),
+        inset 0px 3px 0px rgba(255, 255, 255, 0.45);
+}
+
+.batalha-btn-item:active {
+    box-shadow:
+        0px 2px 0px #0a361d,
+        0px 0px 12px rgba(39, 174, 96, 0.45),
+        inset 0px 2px 0px rgba(255, 255, 255, 0.25);
+}
+
+.batalha-btn-fugir {
+    background: linear-gradient(180deg, #f39c12 0%, #9c5206 100%);
+    border-color: #ffe082;
+    box-shadow:
+        0px 6px 0px #4f2803,
+        0px 0px 18px rgba(243, 156, 18, 0.5),
+        inset 0px 3px 0px rgba(255, 255, 255, 0.35);
+}
+
+.batalha-btn-fugir:hover {
+    box-shadow:
+        0px 7px 0px #4f2803,
+        0px 0px 24px rgba(255, 200, 75, 0.75),
+        inset 0px 3px 0px rgba(255, 255, 255, 0.45);
+}
+
+.batalha-btn-fugir:active {
+    box-shadow:
+        0px 2px 0px #4f2803,
+        0px 0px 12px rgba(243, 156, 18, 0.45),
+        inset 0px 2px 0px rgba(255, 255, 255, 0.25);
+}
+
+/* ========================================
+   RESPONSIVIDADE
+   ======================================== */
+
+@media (max-width: 720px) {
+    .batalha-hud {
+        grid-template-columns: 1fr;
+    }
+
+    .batalha-caixa-texto {
+        min-height: 120px;
+    }
+}
+
+@media (max-width: 480px) {
+    .batalha-arena {
+        gap: 14px;
+    }
+
+    .batalha-sprite-placeholder {
+        width: 96px;
+        height: 96px;
+    }
 }

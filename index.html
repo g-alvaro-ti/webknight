@@ -143,7 +143,42 @@
 
     <!-- Interface da batalha de turnos -->
     <section id="tela-batalha" hidden>
+        <div class="batalha-container">
+            <!-- Parte superior: status e placeholders do jogador e do inimigo -->
+            <div class="batalha-arena">
+                <div class="batalha-combatente batalha-jogador">
+                    <h2 class="batalha-nome">Nome Jogador</h2>
+                    <div class="batalha-hp-barra">
+                        <div class="batalha-hp-preenchimento" style="width: 100%;"></div>
+                        <span class="batalha-hp-texto">HP 100 / 100</span>
+                    </div>
+                    <div class="batalha-sprite-placeholder" aria-label="Placeholder do jogador"></div>
+                </div>
 
+                <div class="batalha-combatente batalha-inimigo">
+                    <h2 class="batalha-nome">Nome Inimigo</h2>
+                    <div class="batalha-hp-barra">
+                        <div class="batalha-hp-preenchimento" style="width: 75%;"></div>
+                        <span class="batalha-hp-texto">HP 30 / 40</span>
+                    </div>
+                    <div class="batalha-sprite-placeholder" aria-label="Placeholder do inimigo"></div>
+                </div>
+            </div>
+
+            <!-- Parte inferior: caixa de texto e grade 2x2 de ações -->
+            <div class="batalha-hud">
+                <div class="batalha-caixa-texto">
+                    <p>Um inimigo bloqueia o seu caminho! Escolha uma ação para este turno.</p>
+                </div>
+
+                <div class="batalha-acoes">
+                    <button type="button" class="batalha-btn batalha-btn-atacar">ATACAR</button>
+                    <button type="button" class="batalha-btn batalha-btn-defender">DEFENDER</button>
+                    <button type="button" class="batalha-btn batalha-btn-item">ITEM</button>
+                    <button type="button" class="batalha-btn batalha-btn-fugir">FUGIR</button>
+                </div>
+            </div>
+        </div>
     </section>
 
     <!-- Tela de fim pra quando perder, contendo o placar de líderes dos jogadores -->
