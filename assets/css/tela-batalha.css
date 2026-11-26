@@ -104,9 +104,19 @@
 
 /* Base em formato de losango atrás dos sprites */
 .batalha-base-sprite {
-    width: clamp(88px, 12vw, 130px);
-    height: clamp(88px, 12vw, 130px);
+    --batalha-base-tamanho: clamp(88px, 12vw, 130px);
+    position: relative;
+
+    width: var(--batalha-base-tamanho);
+    height: var(--batalha-base-tamanho);
     margin: clamp(24px, 3.5vh, 36px) 0 clamp(14px, 2vh, 22px);
+}
+
+.batalha-base-sprite::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
 
     background-color: color-mix(in srgb, var(--cor-cinza1) 80%, transparent);
     border: 2px solid var(--cor-cinza2);
@@ -298,7 +308,6 @@
     }
 
     .batalha-base-sprite {
-        width: 76px;
-        height: 76px;
+        --batalha-base-tamanho: 76px;
     }
 }
