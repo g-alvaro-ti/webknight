@@ -102,16 +102,17 @@
     text-shadow: 0px 2px var(--cor-escuro1);
 }
 
-/* Placeholder quadrado para os sprites */
+/* Placeholder em formato de losango para os sprites */
 .batalha-sprite-placeholder {
-    width: clamp(110px, 16vw, 165px);
-    height: clamp(110px, 16vw, 165px);
-    margin-top: clamp(8px, 1.5vh, 16px);
+    width: clamp(88px, 12vw, 130px);
+    height: clamp(88px, 12vw, 130px);
+    margin: clamp(24px, 3.5vh, 36px) 0 clamp(14px, 2vh, 22px);
 
     background-color: color-mix(in srgb, var(--cor-cinza1) 80%, transparent);
     border: 2px solid var(--cor-cinza2);
-    border-radius: 5px;
+    border-radius: 10px;
     box-shadow: 0px 0px 12px rgb(0, 0, 0);
+    transform: rotate(45deg);
 }
 
 /* ========================================
@@ -297,7 +298,7 @@
     }
 
     .batalha-sprite-placeholder {
-        width: 96px;
-        height: 96px;
+        width: 76px;
+        height: 76px;
     }
 }
