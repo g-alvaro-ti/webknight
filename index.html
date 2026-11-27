@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="assets/css/tela-batalha.css">
     <link rel="stylesheet" href="assets/css/tela-fim.css">
     <link rel="stylesheet" href="assets/css/sprites.css">
+    <link rel="stylesheet" href="assets/css/sprites-batalha.css">
     <link rel="stylesheet" href="assets/css/painel-jogador.css">
     
     <title>WebKnight</title>
@@ -143,7 +144,67 @@
 
     <!-- Interface da batalha de turnos -->
     <section id="tela-batalha" hidden>
+        <div class="batalha-container">
+            <!-- Parte superior: status e base dos sprites do jogador e do inimigo -->
+            <div class="batalha-arena">
+                <div class="batalha-combatente batalha-jogador">
+                    <h2 class="batalha-nome">Nome Jogador</h2>
+                    <div class="batalha-hp-barra">
+                        <div class="batalha-hp-preenchimento" style="width: 100%;"></div>
+                        <span class="batalha-hp-texto">HP 100 / 100</span>
+                    </div>
+                    <div class="batalha-base-sprite" aria-label="Área do sprite do jogador"></div>
+                </div>
 
+                <div class="batalha-combatente batalha-inimigo">
+                    <h2 class="batalha-nome">Nome Inimigo</h2>
+                    <div class="batalha-hp-barra">
+                        <div class="batalha-hp-preenchimento" style="width: 75%;"></div>
+                        <span class="batalha-hp-texto">HP 30 / 40</span>
+                    </div>
+                    <div class="batalha-base-sprite" aria-label="Área do sprite do inimigo"></div>
+                </div>
+            </div>
+
+            <!-- Parte inferior: caixa de texto e grade 2x2 de ações -->
+            <div class="batalha-hud">
+                <div class="batalha-caixa-texto">
+                    <p>Um inimigo bloqueia o seu caminho! Escolha uma ação para este turno.</p>
+                </div>
+
+                <div class="batalha-acoes">
+                    <button type="button" class="batalha-btn batalha-btn-atacar">
+                        <!-- Ícone SVG do botão -->
+                        <svg class="batalha-btn-icone" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+                            <path d="M12 1h3v3l-7 7-3-3 7-7ZM2 8l6 6-1 1-6-6 1-1Zm2 3 1 1-2 2-1-1 2-2ZM1 13h2v2H1v-2Z"/>
+                        </svg>
+                        <span>ATACAR</span>
+                    </button>
+                    <button type="button" class="batalha-btn batalha-btn-defender">
+                        <!-- Ícone SVG do botão -->
+                        <svg class="batalha-btn-icone" viewBox="0 0 16 16" fill="currentColor" fill-rule="evenodd" aria-hidden="true">
+                            <path d="M8 1 2 2.5V8c0 3.5 2.8 5.8 6 7 3.2-1.2 6-3.5 6-7V2.5L8 1ZM7 4h2v3h3v2H9v3H7V9H4V7h3V4Z"/>
+                        </svg>
+                        <span>DEFENDER</span>
+                    </button>
+                    <button type="button" class="batalha-btn batalha-btn-item">
+                        <!-- Ícone SVG do botão -->
+                        <svg class="batalha-btn-icone" viewBox="0 0 16 16" fill="currentColor" fill-rule="evenodd" aria-hidden="true">
+                            <path d="M6.5 1h3v2h-3V1ZM5 3.5h6V5H5V3.5ZM6 5.5h4V7l3 3v3.5L11.5 15h-7L3 13.5V10l3-3V5.5Zm-.8 5.2L6.8 9h2.4l1.6 1.7H5.2Z"/>
+                        </svg>
+                        <span>ITEM</span>
+                    </button>
+                    <button type="button" class="batalha-btn batalha-btn-fugir">
+                        <!-- Ícone SVG do botão -->
+                        <svg class="batalha-btn-icone" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <circle cx="10.5" cy="2.8" r="1.4" fill="currentColor" stroke="none"/>
+                            <path d="M6.5 6.5 9.5 5.5 11.5 7.5 14 7M9.5 5.5 8 9.5l3 2v3.5M8 9.5 5.5 12.5 3 12.5M1.5 6h3M1 9h2.5"/>
+                        </svg>
+                        <span>FUGIR</span>
+                    </button>
+                </div>
+            </div>
+        </div>
     </section>
 
     <!-- Tela de fim pra quando perder, contendo o placar de líderes dos jogadores -->
@@ -157,5 +218,7 @@
     <script src="src/prompt.js"></script>
     <script src="src/mapa.js"></script>
     <script src="src/painel-jogador.js"></script>
+    <script src="src/batalha-sprites.js"></script>
+    <script src="src/batalha-ui.js"></script>
 </body>
 </html>

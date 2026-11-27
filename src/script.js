@@ -46,7 +46,6 @@ function entrarNoJogo(){
 // Inicialização das telas
 document.addEventListener("DOMContentLoaded", () => {
 
-    // Esconde as telas que não devem aparecer inicialmente
     exibirJogo(true);
     exibirBatalhaTurno(true);
     exibirTelaFinal(true);

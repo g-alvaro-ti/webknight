@@ -1,0 +1,28 @@
+/*
+    Spritesheets da tela de batalha
+
+    Reaproveita .sprite-animado e @keyframes animar-sprite do sprites.css,
+    adaptando --cell-size e --escala-sprite para a área das bases
+    e aproximando o personagem dentro do frame 100x100.
+*/
+
+.batalha-base-sprite {
+    --cell-size: var(--batalha-base-tamanho);
+    --escala-sprite: 4.5;
+}
+
+.batalha-base-sprite .batalha-sprite {
+    z-index: 1;
+    pointer-events: none;
+
+    /* Ignora --sprite-offset-x/y usados no mapa (48px), centralizando pela base */
+    left: calc((var(--cell-size) - var(--cell-size) * var(--escala-sprite)) / 2);
+    top: calc((var(--cell-size) - var(--cell-size) * var(--escala-sprite)) / 2);
+
+    filter: drop-shadow(0px 6px 8px rgba(0, 0, 0, 0.85));
+}
+
+/* Espelha horizontalmente apenas o sprite do inimigo para encarar o jogador */
+.batalha-inimigo .batalha-base-sprite .batalha-sprite {
+    transform: scaleX(-1);
+}
