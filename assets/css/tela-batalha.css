@@ -188,11 +188,10 @@
     border-radius: 5px;
     box-shadow:
         0px 6px 0px var(--btn-cor-sombra, var(--cor-escuro1)),
-        0px 0px 14px var(--btn-cor-brilho, rgba(0, 0, 0, 0.45)),
         inset 0px 3px 0px rgba(255, 255, 255, 0.25);
 
     cursor: pointer;
-    transition: filter 0.15s ease, transform 0.12s ease, box-shadow 0.15s ease;
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
 
 .batalha-btn-icone {
@@ -203,19 +202,16 @@
 }
 
 .batalha-btn:hover {
-    transform: translateY(-3px) scale(1.02);
-    filter: brightness(1.12);
+    transform: translateY(-3px);
     box-shadow:
-        0px 7px 0px var(--btn-cor-sombra, var(--cor-escuro1)),
-        0px 0px 20px var(--btn-cor-brilho, rgba(0, 0, 0, 0.6)),
-        inset 0px 3px 0px rgba(255, 255, 255, 0.35);
+        0px 9px 0px var(--btn-cor-sombra, var(--cor-escuro1)),
+        inset 0px 3px 0px rgba(255, 255, 255, 0.3);
 }
 
 .batalha-btn:active {
-    transform: translateY(3px);
+    transform: translateY(4px);
     box-shadow:
         0px 2px 0px var(--btn-cor-sombra, var(--cor-escuro1)),
-        0px 0px 10px var(--btn-cor-brilho, rgba(0, 0, 0, 0.4)),
         inset 0px 2px 0px rgba(255, 255, 255, 0.2);
 }
 
@@ -223,25 +219,21 @@
 .batalha-btn-atacar {
     --btn-cor-borda: #e53935;
     --btn-cor-sombra: #520909;
-    --btn-cor-brilho: rgba(229, 57, 53, 0.55);
 }
 
 .batalha-btn-defender {
     --btn-cor-borda: #2196f3;
     --btn-cor-sombra: #09244a;
-    --btn-cor-brilho: rgba(33, 150, 243, 0.55);
 }
 
 .batalha-btn-item {
     --btn-cor-borda: #27ae60;
     --btn-cor-sombra: #0a361d;
-    --btn-cor-brilho: rgba(39, 174, 96, 0.55);
 }
 
 .batalha-btn-fugir {
     --btn-cor-borda: #f39c12;
     --btn-cor-sombra: #4f2803;
-    --btn-cor-brilho: rgba(243, 156, 18, 0.55);
 }
 
 /* Estado desativado dos botões de ação */

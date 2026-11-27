@@ -175,10 +175,64 @@
     --sprite-offset-y: 0px;
 }
 
+.orc-ataque01 {
+    --sprite-url: url("../sprites/Orc_Attack02.png");
+    --sprite-frames: 6;
+    --sprite-duracao: 0.6s;
+
+    --sprite-offset-x: -10px;
+    --sprite-offset-y: 0px;
+}
+
+.orc-hurt {
+    --sprite-url: url("../sprites/Orc_Hurt.png");
+    --sprite-frames: 4;
+    --sprite-duracao: 0.6s;
+
+    --sprite-offset-x: -10px;
+    --sprite-offset-y: 0px;
+}
+
+.orc-death {
+    --sprite-url: url("../sprites/Orc_Death.png");
+    --sprite-frames: 4;
+    --sprite-duracao: 0.6s;
+
+    --sprite-offset-x: -10px;
+    --sprite-offset-y: 0px;
+}
+
 .monster-idle {
     --sprite-url: url("../sprites/Blood_Monster_A_Idle.png");
     --sprite-frames: 6;
     --sprite-duracao: 1s;
+
+    --sprite-offset-x: -4px;
+    --sprite-offset-y: 0px;
+}
+
+.monster-ataque02 {
+    --sprite-url: url("../sprites/Blood Monster_A_Attack02.png");
+    --sprite-frames: 8;
+    --sprite-duracao: 0.7s;
+
+    --sprite-offset-x: -4px;
+    --sprite-offset-y: 0px;
+}
+
+.monster-hurt {
+    --sprite-url: url("../sprites/Blood Monster_A_Hurt.png");
+    --sprite-frames: 4;
+    --sprite-duracao: 0.6s;
+
+    --sprite-offset-x: -4px;
+    --sprite-offset-y: 0px;
+}
+
+.monster-death {
+    --sprite-url: url("../sprites/Blood Monster_A_Death.png");
+    --sprite-frames: 4;
+    --sprite-duracao: 0.6s;
 
     --sprite-offset-x: -4px;
     --sprite-offset-y: 0px;
@@ -208,7 +262,7 @@
 .rastro-fantasma {
     background-position: 0 calc(-1 * var(--sprite-linha, 0) * var(--cell-size) * var(--escala-sprite));
     pointer-events: none;
-    animation: rastro-fantasma 0.5s ease-out forwards;
+    animation: rastro-fantasma 0.35s ease-out forwards;
 }
 
 @keyframes rastro-fantasma {

@@ -1,6 +1,43 @@
 let podeFugir = true;
 let podeUsarItem = false;
 
+// Catálogo das classes de animação (sprites.css) por entidade
+// Cada animação específica é acessada digitando CAVALEIRO.IDLE, por exemplo
+const CAVALEIRO = Object.freeze({
+    IDLE: "cavaleiro-idle",
+    ATAQUE: "cavaleiro-ataque01",
+    HURT: "cavaleiro-hurt",
+    DEATH: "cavaleiro-death"
+});
+
+const DEMON = Object.freeze({
+    IDLE: "demon-idle",
+    ATAQUE: "demon-ataque01",
+    HURT: "demon-hurt",
+    DEATH: "demon-death"
+});
+
+const ORC = Object.freeze({
+    IDLE: "orc-idle",
+    ATAQUE: "orc-ataque01",
+    HURT: "orc-hurt",
+    DEATH: "orc-death"
+});
+
+const MONSTER = Object.freeze({
+    IDLE: "monster-idle",
+    ATAQUE: "monster-ataque02",
+    HURT: "monster-hurt",
+    DEATH: "monster-death"
+});
+
+const SPRITES_BATALHA = Object.freeze({
+    CAVALEIRO,
+    DEMON,
+    ORC,
+    MONSTER
+});
+
 // Funções dos botões de batalha
 // Temporário:  Só possui código pra testar animações dos sprites e o visual dos botões
 //              Quando for fazer a lógica real de batalha, essas funções devem ser
@@ -9,8 +46,8 @@ async function aoClicarAtacar() {
     console.log("Botão ATACAR acionado.");
     alternarBotoesBatalha(false);
     try {
-        await tocarSpriteBatalhaUmaVez("jogador", "cavaleiro-ataque01");
-        await tocarSpriteBatalhaUmaVez("inimigo", "demon-hurt");
+        await tocarSpriteBatalhaUmaVez("jogador", CAVALEIRO.ATAQUE);
+        await tocarSpriteBatalhaUmaVez("inimigo", DEMON.HURT);
     } finally {
         alternarBotoesBatalha(true);
     }
@@ -20,8 +57,8 @@ async function aoClicarDefender() {
     console.log("Botão DEFENDER acionado.");
     alternarBotoesBatalha(false);
     try {
-        await tocarSpriteBatalhaUmaVez("inimigo", "demon-ataque01");
-        await tocarSpriteBatalhaUmaVez("jogador", "cavaleiro-hurt");
+        await tocarSpriteBatalhaUmaVez("inimigo", DEMON.ATAQUE);
+        await tocarSpriteBatalhaUmaVez("jogador", CAVALEIRO.HURT);
     } finally {
         alternarBotoesBatalha(true);
     }
@@ -36,9 +73,9 @@ async function aoClicarFugir() {
     alternarBotoesBatalha(false);
     try {
         exibirMensagemBatalha("Você tentou fugir, mas o inimigo cercou seu caminho.")
-        await tocarSpriteBatalhaUmaVez("inimigo", "demon-ataque01");
-        await tocarSpriteBatalhaUmaVez("jogador", "cavaleiro-hurt");
-        await tocarSpriteBatalhaECongelar("jogador", "cavaleiro-death");
+        await tocarSpriteBatalhaUmaVez("inimigo", DEMON.ATAQUE);
+        await tocarSpriteBatalhaUmaVez("jogador", CAVALEIRO.HURT);
+        await tocarSpriteBatalhaECongelar("jogador", CAVALEIRO.DEATH);
     } finally {
         alternarBotoesBatalha(false);
     }
@@ -49,8 +86,8 @@ async function aoClicarFugir() {
 // function prepararTelaBatalha({jogador, inimigo}){
 function prepararTelaBatalha(){
     // Exibição de exemplo na tela de batalha usando as classes de sprites.css
-    exibirSpriteBatalha(".batalha-jogador .batalha-base-sprite", "cavaleiro-idle");
-    exibirSpriteBatalha(".batalha-inimigo .batalha-base-sprite", "demon-idle");
+    exibirSpriteBatalha(".batalha-jogador .batalha-base-sprite", CAVALEIRO.IDLE);
+    exibirSpriteBatalha(".batalha-inimigo .batalha-base-sprite", DEMON.IDLE);
 
     atualizarNomeInimigo("Demonho")
     atualizarNomeJogador("Jogador")
