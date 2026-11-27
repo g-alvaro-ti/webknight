@@ -21,12 +21,21 @@ async function aoClicarDefender() {
     }
 }
 
-function aoClicarItem() {
+async function aoClicarItem() {
     console.log("Botão ITEM acionado.");
 }
 
-function aoClicarFugir() {
+async function aoClicarFugir() {
     console.log("Botão FUGIR acionado.");
+    alternarBotoesBatalha(false);
+    try {
+        exibirMensagemBatalha("Você tentou fugir, mas o inimigo cercou seu caminho.")
+        await tocarSpriteBatalhaUmaVez("inimigo", "demon-ataque01");
+        await tocarSpriteBatalhaUmaVez("jogador", "cavaleiro-hurt");
+        await tocarSpriteBatalhaECongelar("jogador", "cavaleiro-death");
+    } finally {
+        alternarBotoesBatalha(false);
+    }
 }
 
 /**
