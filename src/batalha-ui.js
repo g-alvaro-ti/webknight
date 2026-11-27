@@ -1,4 +1,10 @@
+let podeFugir = true;
+let podeUsarItem = false;
+
 // Funções dos botões de batalha
+// Temporário:  Só possui código pra testar animações dos sprites e o visual dos botões
+//              Quando for fazer a lógica real de batalha, essas funções devem ser
+//              apagadas daqui e movidas pro seu próprio arquivo .js
 async function aoClicarAtacar() {
     console.log("Botão ATACAR acionado.");
     alternarBotoesBatalha(false);
@@ -36,6 +42,25 @@ async function aoClicarFugir() {
     } finally {
         alternarBotoesBatalha(false);
     }
+}
+
+// Função pra futuramente pegar as classes do jogador e inimigo,
+// e atualizar as informações/sprites usando seus dados.
+// function prepararTelaBatalha({jogador, inimigo}){
+function prepararTelaBatalha(){
+    // Exibição de exemplo na tela de batalha usando as classes de sprites.css
+    exibirSpriteBatalha(".batalha-jogador .batalha-base-sprite", "cavaleiro-idle");
+    exibirSpriteBatalha(".batalha-inimigo .batalha-base-sprite", "demon-idle");
+
+    atualizarNomeInimigo("Demonho")
+    atualizarNomeJogador("Jogador")
+
+    atualizarVidaJogador(40,100)
+    atualizarVidaInimigo(180,240)
+
+    exibirMensagemBatalha("Um inimigo bloqueia o seu caminho! Escolha uma ação para este turno.")
+
+    alternarBotoesBatalha(true)
 }
 
 /**
@@ -110,13 +135,51 @@ function atualizarVidaInimigo(vidaAtual, vidaMax) {
 }
 
 /**
- * Ativa ou desativa todos os botões de ação da tela de batalha.
+ * Define se o botão de fugir pode ficar ativo na batalha atual.
+ * Deve ser desativado quando o jogador lutar contra um chefe.
+ * @param {boolean} permitido
+ */
+function permitirFuga(permitido) {
+    podeFugir = Boolean(permitido);
+    const botaoFugir = document.querySelector("#tela-batalha .batalha-btn-fugir");
+    if (botaoFugir && !podeFugir) {
+        botaoFugir.disabled = true;
+    }
+}
+
+/**
+ * Define se o botão de usar item pode ficar ativo na batalha atual.
+ * Deve ser desativado quando o jogador tiver com o inventário vazio.
+ * @param {boolean} permitido
+ */
+function permitirUsarItem(permitido) {
+    podeUsarItem = Boolean(permitido);
+    const botaoItem = document.querySelector("#tela-batalha .batalha-btn-item");
+    if (botaoItem && !podeUsarItem) {
+        botaoItem.disabled = true;
+    }
+}
+
+/**
+ * Ativa ou desativa todos os botões de ação da tela de batalha,
+ * respeitando se fugir e usar item estão permitidos.
  * @param {boolean} habilitado - `true` para reativar os botões, `false` para desativar
  */
 function alternarBotoesBatalha(habilitado) {
     const botoes = document.querySelectorAll("#tela-batalha .batalha-acoes .batalha-btn");
     botoes.forEach((botao) => {
-        botao.disabled = !habilitado;
+        if (!habilitado) {
+            botao.disabled = true;
+            return;
+        }
+
+        if (botao.classList.contains("batalha-btn-fugir")) {
+            botao.disabled = !podeFugir;
+        } else if (botao.classList.contains("batalha-btn-item")) {
+            botao.disabled = !podeUsarItem;
+        } else {
+            botao.disabled = false;
+        }
     });
 }
 
@@ -135,13 +198,5 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // Exibição de exemplo na tela de batalha usando as classes de sprites.css
-    exibirSpriteBatalha(".batalha-jogador .batalha-base-sprite", "cavaleiro-idle");
-    exibirSpriteBatalha(".batalha-inimigo .batalha-base-sprite", "demon-idle");
-
-    atualizarNomeInimigo("Demonho")
-    atualizarNomeJogador("Jogador")
-
-    atualizarVidaJogador(40,100)
-    atualizarVidaInimigo(180,240)
+    prepararTelaBatalha()
 });
