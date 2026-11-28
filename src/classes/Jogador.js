@@ -44,16 +44,15 @@ export class Jogador extends Personagem {
         }
     }
     /**
-    *@param{set} atributo_aumentado - Uma das funções set da classe personagem para alterar 
-    o atributo.
+    *@param{string} atributo_aumentado - O nome de um dos atributos da classe Personagem.
     *@param{number} quantidade_aumentada - Valor que a função set irá receber.
     */
     //O ideal é chamar essa função após o termino de cada batalha depois de verificar se o jogador pode 
     //subir de nivel e caso puder exibir uma tela onde ele escolherá qual atributo quer aumentar
-    //via interface gráfica e colocar como parametro dessa função o set do atributo escolhido.
+    //via interface gráfica e colocar como parametro dessa função o nome do atributo escolhido.
     //A quantidade pode ser constante ou não.
     eleva_nivel(atributo_aumentado,quantidade_aumentada) {
-        this.nivel(this.#nivel+1);
-        atributo_aumentado(quantidade_aumentada);    
+        this.#nivel = this.#nivel+1;
+        this[atributo_aumentado] +=quantidade_aumentada;
     }
 }

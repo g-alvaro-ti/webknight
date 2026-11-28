@@ -6,16 +6,14 @@
  * @param {number} [atributos.defesa=8] - Defesa atual exibida
  * @param {number} [atributos.velocidade=20] - Velocidade atual exibida
  */
-function exibirModalEvolucao({
-    vida = 100,
-    forca = 18,
-    defesa = 8,
-    velocidade = 20
-} = {}) {
+let Player;
+const VALOR_EVOLUCAO = 5;
+export function exibirModalEvolucao(jogador) {
     const modal = document.getElementById("modal-evolucao");
     if (!modal) return;
-
-    const valores = { vida, forca, defesa, velocidade };
+    Player = jogador;
+    const valores = {"vida" : jogador.vida,"forca" : jogador.forca,
+        "defesa": jogador.defesa,"velocidade" : jogador.velocidade};
     Object.entries(valores).forEach(([atributo, valor]) => {
         const elementoValor = document.getElementById(`evolucao-valor-${atributo}`);
         if (elementoValor) {
@@ -38,18 +36,22 @@ function fecharModalEvolucao() {
 
 // Funções dos botões "+" (a lógica real de evolução será implementada posteriormente)
 function aoClicarEvoluirVida() {
+    Player.eleva_nivel("vida",VALOR_EVOLUCAO);
     fecharModalEvolucao();
 }
 
 function aoClicarEvoluirForca() {
+    Player.eleva_nivel("forca",VALOR_EVOLUCAO);
     fecharModalEvolucao();
 }
 
 function aoClicarEvoluirDefesa() {
+    Player.eleva_nivel("defesa",VALOR_EVOLUCAO);
     fecharModalEvolucao();
 }
 
 function aoClicarEvoluirVelocidade() {
+    Player.eleva_nivel("velocidade",VALOR_EVOLUCAO);
     fecharModalEvolucao();
 }
 
