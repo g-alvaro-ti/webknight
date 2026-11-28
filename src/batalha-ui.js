@@ -1,5 +1,5 @@
 let podeFugir = true;
-let podeUsarItem = false;
+let podeUsarItem = true;
 
 // Catálogo das classes de animação (sprites.css) por entidade
 // Cada animação específica é acessada digitando CAVALEIRO.IDLE, por exemplo
@@ -66,6 +66,10 @@ async function aoClicarDefender() {
 
 async function aoClicarItem() {
     console.log("Botão ITEM acionado.");
+    // Temporário: abre o modal de evolução para visualização
+    if (typeof exibirModalEvolucao === "function") {
+        exibirModalEvolucao();
+    }
 }
 
 async function aoClicarFugir() {

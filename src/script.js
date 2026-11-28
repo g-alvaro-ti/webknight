@@ -47,7 +47,8 @@ function entrarNoJogo(){
 document.addEventListener("DOMContentLoaded", () => {
 
     exibirJogo(true);
-    exibirBatalhaTurno(true);
+    // Temporário: tela de batalha está sempre visível no final da página, pra facilitar os testes. Mude pra true pra reverter
+    exibirBatalhaTurno(false);
     exibirTelaFinal(true);
 
     // Garante que a página abra sempre na tela inicial, sem rolagem residual

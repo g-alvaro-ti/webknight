@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="assets/css/tela-inicio.css">
     <link rel="stylesheet" href="assets/css/tela-jogo.css">
     <link rel="stylesheet" href="assets/css/tela-batalha.css">
+    <link rel="stylesheet" href="assets/css/modal-evolucao.css">
     <link rel="stylesheet" href="assets/css/tela-fim.css">
     <link rel="stylesheet" href="assets/css/sprites.css">
     <link rel="stylesheet" href="assets/css/sprites-batalha.css">
@@ -213,6 +214,64 @@
 
     </section>
 
+    <!-- Modal de evolução de atributos (Level Up) -->
+    <div id="modal-evolucao" class="modal-evolucao-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-evolucao-titulo" hidden>
+        <div class="modal-evolucao-conteudo">
+            <h2 id="modal-evolucao-titulo" class="modal-evolucao-mensagem">Você subiu de nível! Escolha um atributo para evoluir.</h2>
+
+            <div class="modal-evolucao-lista">
+                <div class="modal-evolucao-item modal-evolucao-item-vida">
+                    <div class="modal-evolucao-card">
+                        <!-- Novo ícone SVG de coração para Vida -->
+                        <svg class="modal-evolucao-icone" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+                            <path d="M3 2h3v1h1v1h2V3h1V2h3v1h1v1h1v4h-1v1h-1v1h-1v1h-1v1h-1v1h-1v1H7v-1H6v-1H5v-1H4v-1H3V9H2V8H1V4h1V3h1V2Z"/>
+                        </svg>
+                        <span class="modal-evolucao-nome">Vida</span>
+                        <span id="evolucao-valor-vida" class="modal-evolucao-valor">100</span>
+                    </div>
+                    <button type="button" id="btn-evoluir-vida" class="modal-evolucao-btn modal-evolucao-btn-vida" aria-label="Evoluir Vida">+</button>
+                </div>
+
+                <div class="modal-evolucao-item modal-evolucao-item-forca">
+                    <div class="modal-evolucao-card">
+                        <!-- Ícone SVG reutilizado do botão ATACAR -->
+                        <svg class="modal-evolucao-icone" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+                            <path d="M12 1h3v3l-7 7-3-3 7-7ZM2 8l6 6-1 1-6-6 1-1Zm2 3 1 1-2 2-1-1 2-2ZM1 13h2v2H1v-2Z"/>
+                        </svg>
+                        <span class="modal-evolucao-nome">Força</span>
+                        <span id="evolucao-valor-forca" class="modal-evolucao-valor">18</span>
+                    </div>
+                    <button type="button" id="btn-evoluir-forca" class="modal-evolucao-btn modal-evolucao-btn-forca" aria-label="Evoluir Força">+</button>
+                </div>
+
+                <div class="modal-evolucao-item modal-evolucao-item-defesa">
+                    <div class="modal-evolucao-card">
+                        <!-- Ícone SVG reutilizado do botão DEFENDER -->
+                        <svg class="modal-evolucao-icone" viewBox="0 0 16 16" fill="currentColor" fill-rule="evenodd" aria-hidden="true">
+                            <path d="M8 1 2 2.5V8c0 3.5 2.8 5.8 6 7 3.2-1.2 6-3.5 6-7V2.5L8 1ZM7 4h2v3h3v2H9v3H7V9H4V7h3V4Z"/>
+                        </svg>
+                        <span class="modal-evolucao-nome">Defesa</span>
+                        <span id="evolucao-valor-defesa" class="modal-evolucao-valor">8</span>
+                    </div>
+                    <button type="button" id="btn-evoluir-defesa" class="modal-evolucao-btn modal-evolucao-btn-defesa" aria-label="Evoluir Defesa">+</button>
+                </div>
+
+                <div class="modal-evolucao-item modal-evolucao-item-velocidade">
+                    <div class="modal-evolucao-card">
+                        <!-- Ícone SVG reutilizado do botão FUGIR -->
+                        <svg class="modal-evolucao-icone" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <circle cx="10.5" cy="2.8" r="1.4" fill="currentColor" stroke="none"/>
+                            <path d="M6.5 6.5 9.5 5.5 11.5 7.5 14 7M9.5 5.5 8 9.5l3 2v3.5M8 9.5 5.5 12.5 3 12.5M1.5 6h3M1 9h2.5"/>
+                        </svg>
+                        <span class="modal-evolucao-nome">Velocidade</span>
+                        <span id="evolucao-valor-velocidade" class="modal-evolucao-valor">20</span>
+                    </div>
+                    <button type="button" id="btn-evoluir-velocidade" class="modal-evolucao-btn modal-evolucao-btn-velocidade" aria-label="Evoluir Velocidade">+</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="src/constants/mapa.js"></script>
     <script src="src/constants/personagens.js"></script>
     <script src="src/audio.js"></script>
@@ -222,6 +281,7 @@
     <script src="src/mapa.js"></script>
     <script src="src/painel-jogador.js"></script>
     <script src="src/batalha-sprites.js"></script>
+    <script src="src/evolucao.js"></script>
     <script src="src/batalha-ui.js"></script>
 </body>
 </html>

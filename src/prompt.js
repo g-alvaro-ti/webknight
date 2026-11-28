@@ -57,7 +57,7 @@ function gerar_prompt_mapa(lista_regiao){
     REGRAS:
     - A matriz DEVE conter exatamente 1 jogador (${JOGADOR}).
     - A matriz DEVE conter exatamente 1 saída (${SAIDA}).
-    - A matriz DEVE conter NO MÍNIMO 1 inimigo (${INIMIGO}), podendo conter vários.
+    - A matriz DEVE conter NO MÁXIMO 4 inimigos (${INIMIGO}).
     - É PROIBIDO gerar um mapa sem inimigos.
     - É PROIBIDO gerar mais de um jogador.
     - É PROIBIDO gerar mais de uma saída.
