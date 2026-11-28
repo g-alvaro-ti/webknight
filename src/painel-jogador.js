@@ -1,14 +1,19 @@
+import { Jogador } from "./classes/Jogador.js";
+import { STATUS_JOGADOR } from "./constants/personagens.js";
 // ============================================================
 // painel-jogador.js  —  src/painel_informacoes/
 // Painel lateral esquerdo + colapso em telas pequenas.
 // ============================================================
 
 // ---- Dados de exemplo (serão substituídos pela classe Jogador futuramente) ----
+export let jogador = new Jogador(STATUS_JOGADOR.nome,
+    STATUS_JOGADOR.vida,STATUS_JOGADOR.forca,STATUS_JOGADOR.defesa,STATUS_JOGADOR.velocidade,0,0
+);
 const dadosJogador = {
-    vida:       { atual: 80, max: 100 },
-    forca:      { atual: 45, max: 100 },
-    defesa:     { atual: 60, max: 100 },
-    velocidade: { atual: 70, max: 100 }
+    vida:       { atual: 80, max: jogador.vida },
+    forca:      { atual: jogador.forca, max: jogador.forca },
+    defesa:     { atual: jogador.defesa, max: jogador.defesa },
+    velocidade: { atual: jogador.velocidade, max: jogador.velocidade }
 };
 
 // ---- Dados de localização de exemplo ----
@@ -216,7 +221,7 @@ function atualizarLocalizacao(dados) {
 // ---- Função principal: atualiza TODO o painel de uma vez ----
 // Chame sempre que jogador ou localização mudarem.
 // Parâmetros opcionais; se omitidos, usa os dados internos de exemplo.
-function atualizarPainelJogador(novosDadosJogador, novosDadosLocalizacao) {
+export function atualizarPainelJogador(novosDadosJogador, novosDadosLocalizacao) {
     if (novosDadosJogador)     Object.assign(dadosJogador,     novosDadosJogador);
     if (novosDadosLocalizacao) Object.assign(dadosLocalizacao, novosDadosLocalizacao);
 
@@ -226,7 +231,7 @@ function atualizarPainelJogador(novosDadosJogador, novosDadosLocalizacao) {
 
 // ---- Notifica o painel quando um novo mapa é gerado ----
 // Deve ser chamada por gerarMapa() em mapa.js
-function notificarMudancaMapa(novaRegiao) {
+export function notificarMudancaMapa(novaRegiao) {
     dadosLocalizacao.mapasVisitados += 1;
     if (novaRegiao) dadosLocalizacao.regiao = novaRegiao;
     atualizarLocalizacao(dadosLocalizacao);

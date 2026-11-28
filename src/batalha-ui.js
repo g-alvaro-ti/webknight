@@ -1,6 +1,5 @@
 import { exibirModalEvolucao } from "./evolucao.js";
-import { Jogador } from "./classes/Jogador.js";
-
+import {jogador} from "./painel-jogador.js";
 let podeFugir = true;
 let podeUsarItem = true;
 
@@ -67,7 +66,6 @@ async function aoClicarDefender() {
     }
 }
 
-let jogador = new Jogador("Player",120,18,8,20,1,0);
 async function aoClicarItem() {
     console.log("Botão ITEM acionado.");
     if (typeof exibirModalEvolucao === "function") {

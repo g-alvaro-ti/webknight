@@ -1,3 +1,6 @@
+import {gerarMapa,adicionarSpriteAnimado} from "./mapa.js";
+import { STATUS_JOGADOR} from "./constants/personagens.js";
+
 const PISO = 0;
 const SAIDA = 1;
 const PAREDE = 2;
@@ -9,7 +12,7 @@ const CIDADE = "Cidade";
 const RUINA = "Ruina";
 const MONTANHA = "Montanha";
 
-const lista_regiao = [FLORESTA,CIDADE,RUINA,MONTANHA];
+export const lista_regiao = [FLORESTA,CIDADE,RUINA,MONTANHA];
 
 let botaoModalGeminiSim = document.querySelector("#btn-modal-gemini-sim")
 let botaoModalGeminiNao = document.querySelector("#btn-modal-gemini-nao")
@@ -36,7 +39,7 @@ function esconderAnimacaoGemini() {
     animacaoGemini.hidden = true;
 }
 
-function cenario_aleatorio(lista_regiao){
+export function cenario_aleatorio(lista_regiao){
     const indice = Math.floor(Math.random() * lista_regiao.length);
     return lista_regiao[indice];
 }
@@ -386,7 +389,7 @@ function obterProximoCenario(cenarioAtual) {
 }
 
 // Solicita um novo mapa: via Gemini (se houver chave cadastrada) ou via mapa padrão local
-async function solicitarNovoMapa(cenario) {
+export async function solicitarNovoMapa(cenario) {
     const temChave = obterChavesGemini().length > 0;
 
     if (temChave) {
@@ -541,7 +544,7 @@ async function gerarNarrativa({ tipoCenario = "Floresta", descricaoMapa = "", fo
 // Gera a narrativa do cenário atual e mostra na tela do jogo.
 // "descricaoMapa" é a descricao que o Gemini devolve junto com o mapa (opcional).
 // "mapasVisitados" não é mais usado: a Narrativa conta as transições sozinha.
-async function solicitarNovaNarrativa(cenario, mapasVisitados, descricaoMapa = "") {
+export async function solicitarNovaNarrativa(cenario, mapasVisitados, descricaoMapa = "") {
     await garantirNarrativa();
     const { texto } = await gerarNarrativa({ tipoCenario: cenario, descricaoMapa });
     return texto;

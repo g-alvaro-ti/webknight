@@ -1,3 +1,7 @@
+import {notificarMudancaMapa} from "./painel-jogador.js";
+import {cenario_aleatorio,lista_regiao,solicitarNovaNarrativa,solicitarNovoMapa
+
+} from "./prompt.js";
 const mapaContainer = document.querySelector(".jogo-mapa-container");
 
 let jogadorElemento = null;
@@ -10,7 +14,7 @@ let timerAndar   = null;
 const inimigos = [];
 
 // Função para injetar uma imagem estática em uma célula específica
-function adicionarCamada(celula, caminhoImagem, ordemZ = 1) {
+export function adicionarCamada(celula, caminhoImagem, ordemZ = 1) {
     const img = document.createElement("img");
     img.src = caminhoImagem;
     img.classList.add("camada-sprite");
@@ -20,7 +24,7 @@ function adicionarCamada(celula, caminhoImagem, ordemZ = 1) {
 }
 
 // Função pra injetar uma spritesheet (definida em sprites.css) em uma célula
-function adicionarSpriteAnimado(celula, classeSprite, ordemZ = 1) {
+export function adicionarSpriteAnimado(celula, classeSprite, ordemZ = 1) {
     const sprite = document.createElement("div");
 
     sprite.classList.add(
@@ -37,7 +41,7 @@ function adicionarSpriteAnimado(celula, classeSprite, ordemZ = 1) {
 }
 
 // Move o sprite entre células deixando um fantasma translúcido na célula de origem
-function moverSpriteComRastro(sprite, celulaOrigem, celulaDestino, dx = 0, dy = 0) {
+export function moverSpriteComRastro(sprite, celulaOrigem, celulaDestino, dx = 0, dy = 0) {
     const fantasma = sprite.cloneNode(false);
     fantasma.classList.remove("sprite-passo-transicao");
     fantasma.classList.add("rastro-fantasma");
@@ -62,7 +66,7 @@ function moverSpriteComRastro(sprite, celulaOrigem, celulaDestino, dx = 0, dy = 
 
 const mapa = [];
 
-function gerarMapaVazio(){
+export function gerarMapaVazio(){
     for (let i = 0; i < CONFIG_MAPA.COLUNAS; i++) {
         mapa[i] = [];
 
@@ -78,7 +82,7 @@ function gerarMapaVazio(){
     }
 }
 
-function gerarMapa(matriz_mapa, tipo_cenario) {
+export function gerarMapa(matriz_mapa, tipo_cenario) {
     // Limpa o mapa anterior
     mapaContainer.innerHTML = [];
 
@@ -122,7 +126,7 @@ function gerarMapa(matriz_mapa, tipo_cenario) {
                     celula.dataset.tipo = "piso"
 
                     // Coloca uma cor mais escura em pisos aleatórios, com 2 tons diferentes
-                    chance_textura = Math.floor(Math.random() * 5);
+                    let chance_textura = Math.floor(Math.random() * 5);
 
                     if(chance_textura == 1){
                         adicionarCamada(celula, ASSETS_MAPA.TEXTURE_1, 2);
@@ -211,7 +215,7 @@ if(mapaTestePadrao == true){
     }
 }
 
-function moverJogador(dx, dy) {
+export function moverJogador(dx, dy) {
     if (carregandoMapa) return false;
     if (!jogadorElemento) return false;
 
@@ -296,7 +300,7 @@ function podeMoverInimigo(linha, coluna) {
 
 // Sorteia um movimento aleatório pra cada inimigo do mapa,
 // com chance de permanecer parado, e já move o sprite pra célula destino
-function moverInimigos() {
+export function moverInimigos() {
     for (const inimigo of inimigos) {
         // Chance de permanecer parado neste turno
         if (Math.random() < CONFIG_MAPA.CHANCE_INIMIGO_PARADO) continue;
@@ -370,7 +374,7 @@ let ultimoTempoMovimento = 0;
 const DELAY_MOVIMENTO    = 150;     // ms entre passos
 
 // Diagonal: prioriza a tecla pressionada MAIS RECENTEMENTE
-function calcularDirecaoSegurada() {
+export function calcularDirecaoSegurada() {
     const ativa = (t) => (teclasPressionadas[t] || 0) > 0;
 
     const cima     = ativa("w") || ativa("arrowup");
@@ -486,20 +490,20 @@ let carregandoMapa = false;
 
 // 1. Detectar quando o jogador entra em uma célula com inimigo
 // 2. Exibir uma mensagem no console indicando o encontro, sem implementar batalhas
-function detectarEncontroInimigo(linha, coluna, celula) {
+export function detectarEncontroInimigo(linha, coluna, celula) {
     console.log(`Encontro com inimigo em [${linha}, ${coluna}]`);
     if (typeof tocarSomInimigo === "function") tocarSomInimigo();
 }
 
 // 3. Detectar quando o jogador alcança a saída
-function detectarSaida(linha, coluna) {
+export function detectarSaida(linha, coluna) {
     console.log(`Saída alcançada em [${linha}, ${coluna}]`);
     trocarDeMapa();
 }
 
 // 4. Solicitar um novo mapa e uma nova narrativa
 // 5. Atualizar a tela com o novo mapa, preservando as estatísticas da sessão
-async function trocarDeMapa() {
+export async function trocarDeMapa() {
     if (carregandoMapa) return;
     carregandoMapa = true;
 
@@ -553,7 +557,7 @@ async function trocarDeMapa() {
     }
 }
 
-function atualizarTelaComNovoMapa(matrizMapa, tipoCenario, novaNarrativa) {
+export function atualizarTelaComNovoMapa(matrizMapa, tipoCenario, novaNarrativa) {
     // 1. Gera o novo mapa visualmente na tela (recria as células e posiciona o jogador)
     // notificarMudancaMapa() é acionada internamente em gerarMapa(), incrementando mapasVisitados
     // e preservando os atributos do jogador no painel lateral

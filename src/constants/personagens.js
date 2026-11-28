@@ -1,4 +1,4 @@
-const STATUS_JOGADOR = Object.freeze({
+export const STATUS_JOGADOR = Object.freeze({
     nome: "Aventureiro",
     vida: 80,
     forca: 18,
@@ -7,7 +7,7 @@ const STATUS_JOGADOR = Object.freeze({
     nivel: 1
 });
 
-const STATUS_INIMIGO = Object.freeze({
+export const STATUS_INIMIGO = Object.freeze({
     VORAX: Object.freeze({
         nome: "Vorax",
         vida: 80,

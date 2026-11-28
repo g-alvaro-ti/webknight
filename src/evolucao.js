@@ -1,3 +1,4 @@
+import { atualizarPainelJogador } from "./painel-jogador.js";
 /**
  * Exibe o modal de evolução de atributos (Level Up) com os valores atuais.
  * @param {object} [atributos] - Valores atuais dos atributos exibidos no modal
@@ -34,24 +35,41 @@ function fecharModalEvolucao() {
     }
 }
 
+function get_json_player(Player){
+    return {
+        vida:       { atual: 80, max: Player.vida },
+        forca:      { atual: Player.forca, max: Player.forca },
+        defesa:     { atual: Player.defesa, max: Player.defesa },
+        velocidade: { atual: Player.velocidade, max: Player.velocidade }
+    };
+}
+
 // Funções dos botões "+" (a lógica real de evolução será implementada posteriormente)
 function aoClicarEvoluirVida() {
     Player.eleva_nivel("vida",VALOR_EVOLUCAO);
+    let json_player = get_json_player(Player);
+    atualizarPainelJogador(json_player);
     fecharModalEvolucao();
 }
 
 function aoClicarEvoluirForca() {
     Player.eleva_nivel("forca",VALOR_EVOLUCAO);
+    let json_player = get_json_player(Player);
+    atualizarPainelJogador(json_player);
     fecharModalEvolucao();
 }
 
 function aoClicarEvoluirDefesa() {
     Player.eleva_nivel("defesa",VALOR_EVOLUCAO);
+    let json_player = get_json_player(Player);
+    atualizarPainelJogador(json_player);
     fecharModalEvolucao();
 }
 
 function aoClicarEvoluirVelocidade() {
     Player.eleva_nivel("velocidade",VALOR_EVOLUCAO);
+    let json_player = get_json_player(Player);
+    atualizarPainelJogador(json_player);
     fecharModalEvolucao();
 }
 
