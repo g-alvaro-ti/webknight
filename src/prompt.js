@@ -117,12 +117,12 @@ function exibirMapaCarregamento() {
 }
 
 const TIMEOUT_MAPA_MS = 15000;
+const MODELO_GEMINI = "gemini-3.5-flash-lite";
 
 async function chamar_gemini(prompt) {
     exibirMapaCarregamento();
     const API_KEY = proximaChaveGemini();
-    const MODELO = "gemini-3.5-flash";
-    const URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODELO}:generateContent`;
+    const URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODELO_GEMINI}:generateContent`;
     try {
         if (!API_KEY) {
             throw new Error("Chave de API não informada.");
@@ -148,7 +148,6 @@ async function chamar_gemini(prompt) {
                 // Força o resultado do prompt ser JSON, com essa exata estrutura:
                 generationConfig: {
                     responseMimeType: "application/json",
-
                     responseSchema: {
                         type: "OBJECT",
                         properties: {
@@ -419,7 +418,7 @@ async function solicitarNovoMapa(cenario) {
 // ============================================================
 
 // Mesmo modelo usado na geração do mapa.
-const MODELO_NARRATIVA = "gemini-3.5-flash";
+const MODELO_NARRATIVA = "gemini-2.5-flash-lite";
 
 // Tempo máximo de espera pela API; passou disso, usa o fallback.
 const TIMEOUT_NARRATIVA_MS = 15000;
@@ -440,9 +439,20 @@ async function iniciarNarrativa(jogador, dadosSalvos = null) {
 // Garante que a narrativa exista antes de gerar um texto.
 // TEMPORÁRIO: usa um jogador provisório até o jogo criar o Jogador real e chamar iniciarNarrativa().
 async function garantirNarrativa() {
-    if (narrativa) return narrativa;
+    if (narrativa)
+        return narrativa;
+    
     const { Jogador } = await import("./classes/Jogador.js");
-    return iniciarNarrativa(new Jogador("Aventureiro", 100, 10, 5, 1));
+    
+    // Correção do valores fixos, agora é utilizado dados do arquivo de contantes.
+    return iniciarNarrativa(new Jogador(
+        STATUS_JOGADOR.nome,
+        STATUS_JOGADOR.vida,
+        STATUS_JOGADOR.forca,
+        STATUS_JOGADOR.defesa,
+        STATUS_JOGADOR.velocidade,
+        STATUS_JOGADOR.nivel
+    ));
 }
 
 // Chamada ao Gemini que retorna TEXTO SIMPLES.
@@ -451,7 +461,7 @@ async function chamar_gemini_texto(prompt) {
     const API_KEY = proximaChaveGemini();
     if (!API_KEY) throw new Error("Nenhuma chave da API do Gemini cadastrada nas configurações.");
 
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODELO_NARRATIVA}:generateContent`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODELO_GEMINI}:generateContent`;
 
     const resposta = await fetch(url, {
         method: "POST",
@@ -461,7 +471,9 @@ async function chamar_gemini_texto(prompt) {
         },
         body: JSON.stringify({
             contents: [{ parts: [{ text: prompt }] }],
-            generationConfig: { temperature: 0.9 }
+            generationConfig: {
+                temperature: 0.9,
+            }
         }),
         signal: AbortSignal.timeout(TIMEOUT_NARRATIVA_MS)
     });

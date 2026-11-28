@@ -5,70 +5,9 @@ let jogadorPosicao  = { linha: 0, coluna: 0 };
 let direcaoAtual = "baixo";  
 let timerAndar   = null;     
 
-const LINHAS = 10;
-const COLUNAS = 15;
-
 // Estado dos inimigos presentes no mapa (posição + elemento do sprite),
 // mantido aqui pra não perder eles a cada tela gerada
 const inimigos = [];
-
-// Chance do inimigo permanecer parado em vez de tentar se movimentar
-const CHANCE_INIMIGO_PARADO = 0.3;
-
-// Direções possíveis que um inimigo pode tomar (sem diagonais)
-const DIRECOES_INIMIGO = [
-    { dx:  0, dy: -1 }, // Cima
-    { dx:  0, dy:  1 }, // Baixo
-    { dx: -1, dy:  0 }, // Esquerda
-    { dx:  1, dy:  0 }  // Direita
-];
-
-const SPRITE_PLAYER = "assets/sprites/Soldier_Idle1.png"
-const SPRITE_DEMON = "assets/sprites/Demon_A_Idle1.png"
-const OBJECT_TREE = "assets/sprites/object-tree.png"
-const TEXTURE_1 = "assets/sprites/texture.png"
-const TEXTURE_2 = "assets/sprites/texture2.png"
-
-const CORES_REGIOES = {
-    "Floresta": {
-        0: "#558c3b", // Piso
-        1: "#D9C65B", // Saída
-        2: "#344D2D", // Parede
-        3: "#477A3C", // Inimigo (piso)
-        4: "#477A3C"  // Jogador (piso)
-    },
-
-    "Cidade": {
-        0: "#858585",
-        1: "#D9C65B",
-        2: "#454545",
-        3: "#858585",
-        4: "#858585"
-    },
-
-    "Ruina": {
-        0: "#81765D",
-        1: "#D9C65B",
-        2: "#49443A",
-        3: "#81765D",
-        4: "#81765D"
-    },
-
-    "Montanha": {
-        0: "#A6ADB5",
-        1: "#D9C65B",
-        2: "#59616B",
-        3: "#A6ADB5",
-        4: "#A6ADB5"
-    }
-};
-
-const INIMIGOS_REGIOES = {
-    "Floresta": "orc-idle",
-    "Cidade":   "orc-idle",
-    "Ruina":    "monster-idle",
-    "Montanha": "demon-idle"
-};
 
 // Função para injetar uma imagem estática em uma célula específica
 function adicionarCamada(celula, caminhoImagem, ordemZ = 1) {
@@ -122,19 +61,21 @@ function moverSpriteComRastro(sprite, celulaOrigem, celulaDestino, dx = 0, dy = 
 }
 
 const mapa = [];
+
 function gerarMapaVazio(){
-for (let i = 0; i < LINHAS; i++) {
-    mapa[i] = [];
-    for (let j = 0; j < COLUNAS; j++) {
-        const celula = document.createElement("div");
-        celula.classList.add("mapa-celula");
-        
-        celula.dataset.linha = i;
-        celula.dataset.coluna = j;
-        mapa[i][j] = celula;
-        mapaContainer.appendChild(celula);
+    for (let i = 0; i < CONFIG_MAPA.COLUNAS; i++) {
+        mapa[i] = [];
+
+        for (let j = 0; j < CONFIG_MAPA.LINHAS; j++) {
+            const celula = document.createElement("div");
+            celula.classList.add("mapa-celula");
+            
+            celula.dataset.linha = i;
+            celula.dataset.coluna = j;
+            mapa[i][j] = celula;
+            mapaContainer.appendChild(celula);
+        }
     }
-}
 }
 
 function gerarMapa(matriz_mapa, tipo_cenario) {
@@ -184,9 +125,9 @@ function gerarMapa(matriz_mapa, tipo_cenario) {
                     chance_textura = Math.floor(Math.random() * 5);
 
                     if(chance_textura == 1){
-                        adicionarCamada(celula, TEXTURE_1, 2);
+                        adicionarCamada(celula, ASSETS_MAPA.TEXTURE_1, 2);
                     }else if(chance_textura == 2){
-                        adicionarCamada(celula, TEXTURE_2, 2);
+                        adicionarCamada(celula, ASSETS_MAPA.TEXTURE_2, 2);
                     }
 
                     break;
@@ -277,8 +218,8 @@ function moverJogador(dx, dy) {
     const novaLinha  = jogadorPosicao.linha  + dy;
     const novaColuna = jogadorPosicao.coluna + dx;
 
-    if (novaLinha  < 0 || novaLinha  >= LINHAS)  return false;
-    if (novaColuna < 0 || novaColuna >= COLUNAS) return false;
+    if (novaLinha  < 0 || novaLinha  >= CONFIG_MAPA.LINHAS)  return false;
+    if (novaColuna < 0 || novaColuna >= CONFIG_MAPA.COLUNAS) return false;
 
     const celulaDestino = mapa[novaLinha][novaColuna];
 
@@ -341,8 +282,8 @@ function moverJogador(dx, dy) {
 // Verifica se a célula destino pode ser ocupada por um inimigo,
 // bloqueando paredes, os limites do mapa, outros inimigos e o próprio jogador
 function podeMoverInimigo(linha, coluna) {
-    if (linha  < 0 || linha  >= LINHAS)  return false;
-    if (coluna < 0 || coluna >= COLUNAS) return false;
+    if (linha  < 0 || linha  >= CONFIG_MAPA.LINHAS)  return false;
+    if (coluna < 0 || coluna >= CONFIG_MAPA.COLUNAS) return false;
 
     const tipoCelula = mapa[linha][coluna].dataset.tipo;
     if (tipoCelula === "parede" || tipoCelula === "inimigo" || tipoCelula === "saida") return false;
@@ -358,7 +299,7 @@ function podeMoverInimigo(linha, coluna) {
 function moverInimigos() {
     for (const inimigo of inimigos) {
         // Chance de permanecer parado neste turno
-        if (Math.random() < CHANCE_INIMIGO_PARADO) continue;
+        if (Math.random() < CONFIG_MAPA.CHANCE_INIMIGO_PARADO) continue;
 
         // Calcula a distância entre o inimigo e o jogador
         const diferencaLinha = jogadorPosicao.linha - inimigo.linha;
@@ -422,22 +363,8 @@ function moverInimigos() {
     }
 }
 
-
-const TECLAS_MOVIMENTO = {
-    w:          { dx:  0, dy: -1 },
-    s:          { dx:  0, dy:  1 },
-    a:          { dx: -1, dy:  0 },
-    d:          { dx:  1, dy:  0 },
-    arrowup:    { dx:  0, dy: -1 },
-    arrowdown:  { dx:  0, dy:  1 },
-    arrowleft:  { dx: -1, dy:  0 },
-    arrowright: { dx:  1, dy:  0 }
-};
-
 const teclasPressionadas = {};      // timestamp de cada tecla (0 = solta)
 const filaInputs         = [];      // fila pra não perder toques rápidos
-const MAX_FILA           = 3;
-const EXPIRACAO_INPUT    = 300;     // ms
 
 let ultimoTempoMovimento = 0;
 const DELAY_MOVIMENTO    = 150;     // ms entre passos
@@ -482,12 +409,12 @@ function tentarMover() {
     if (!jogadorElemento) return;
 
     const agora = Date.now();
-    if (agora - ultimoTempoMovimento < DELAY_MOVIMENTO) return;
+    if (agora - ultimoTempoMovimento < CONFIG_MAPA.DELAY_MOVIMENTO_MS) return;
 
     // 1) Fila de toques rápidos
     while (filaInputs.length > 0) {
         const input = filaInputs.shift();
-        if (agora - input.criadoEm > EXPIRACAO_INPUT) continue;
+        if (agora - input.criadoEm > CONFIG_MAPA.EXPIRACAO_INPUT_MS) continue;
 
         // ✅ só paga cooldown se moveu de fato
         if (moverJogador(input.dx, input.dy)) {
@@ -511,7 +438,7 @@ document.addEventListener("keydown", (evento) => {
     if (tag === "INPUT" || tag === "TEXTAREA") return;
 
     const tecla = evento.key.toLowerCase();
-    const dir = TECLAS_MOVIMENTO[tecla];
+    const dir =  TECLAS_MOVIMENTO[tecla];
     if (!dir) return;
 
     evento.preventDefault();
@@ -521,7 +448,7 @@ document.addEventListener("keydown", (evento) => {
 
     teclasPressionadas[tecla] = Date.now();
 
-    if (filaInputs.length < MAX_FILA) {
+    if (filaInputs.length < CONFIG_MAPA.MAX_FILA_INPUTS) {
         filaInputs.push({ dx: dir.dx, dy: dir.dy, criadoEm: Date.now() });
     }
 
